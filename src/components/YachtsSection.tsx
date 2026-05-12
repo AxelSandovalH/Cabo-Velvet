@@ -3,41 +3,40 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
-
-const WHATSAPP_NUMBER = "526241234567";
+import Link from "next/link";
 
 const yachts = [
   {
     id: "benetti",
+    slug: "velvet-yachts",
     name: "VELVET YACHTS",
     tagline: "Unparalleled Charters",
     detail: "120ft Benetti · 10 guests",
     image: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=900&q=90&auto=format&fit=crop",
-    msg: "Hi, I'd like to charter the 120ft Benetti superyacht.",
   },
   {
     id: "horizon",
+    slug: "horizon-85",
     name: "HORIZON 85",
     tagline: "Sunset · Sea of Cortez",
     detail: "85ft Horizon · 8 guests",
     image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=900&q=90&auto=format&fit=crop",
-    msg: "Hi, I'm interested in chartering the Horizon 85.",
   },
   {
     id: "azimut",
+    slug: "azure-60",
     name: "AZURE 60",
     tagline: "Day Charter · Open Bar",
     detail: "60ft Azimut · 12 guests",
     image: "https://images.unsplash.com/photo-1599687267812-35c05ff70ee9?w=900&q=90&auto=format&fit=crop",
-    msg: "Hi, I'd like to book the Azure 60 for a day charter.",
   },
   {
     id: "cat",
+    slug: "deep-blue",
     name: "DEEP BLUE",
     tagline: "Catamaran · Full Day",
     detail: "48ft Leopard · 14 guests",
     image: "https://images.unsplash.com/photo-1534190760961-74e8c1c5c3da?w=900&q=90&auto=format&fit=crop",
-    msg: "Hi, I'd like info on the Deep Blue catamaran.",
   },
 ];
 
@@ -87,7 +86,7 @@ export default function YachtsSection() {
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.25 }}
-            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi, I'd like to see the full yacht charter fleet in Los Cabos.")}`}
+            href="https://wa.me/526241234567?text=Hi%2C%20I'd%20like%20to%20see%20the%20full%20yacht%20fleet%20in%20Los%20Cabos."
             target="_blank"
             rel="noopener noreferrer"
             className="self-start text-[9px] tracking-[0.28em] text-[#3A3028] uppercase hover:text-[#C4A45A] transition-colors duration-300 hover-line pb-0.5"
@@ -123,7 +122,6 @@ export default function YachtsSection() {
 function YachtCard({ yacht, index }: { yacht: (typeof yachts)[0]; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-40px" });
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(yacht.msg)}`;
 
   return (
     <motion.div
@@ -133,7 +131,7 @@ function YachtCard({ yacht, index }: { yacht: (typeof yachts)[0]; index: number 
       transition={{ duration: 0.8, delay: index * 0.09, ease: [0.16, 1, 0.3, 1] }}
       className="flex-shrink-0 w-[82vw] md:w-[360px] lg:w-[400px] group"
     >
-      <a href={url} target="_blank" rel="noopener noreferrer" className="block">
+      <Link href={`/yachts/${yacht.slug}`} className="block">
         <div
           className="relative overflow-hidden"
           style={{ height: "clamp(280px, 60vw, 460px)" }}
@@ -173,7 +171,7 @@ function YachtCard({ yacht, index }: { yacht: (typeof yachts)[0]; index: number 
 
           <div className="absolute inset-0 bg-[#C4A45A]/0 group-hover:bg-[#C4A45A]/5 transition-colors duration-500" />
         </div>
-      </a>
+      </Link>
     </motion.div>
   );
 }

@@ -3,12 +3,12 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
-
-const WHATSAPP_NUMBER = "526241234567";
+import Link from "next/link";
 
 const villas = [
   {
     id: "solano",
+    slug: "villa-solano",
     name: "VILLA SOLANO",
     tagline: "Ultra-Private Oceanfront",
     location: "El Pedregal · 5 BR",
@@ -17,27 +17,30 @@ const villas = [
   },
   {
     id: "obsidian",
+    slug: "villa-obsidian",
     name: "VILLA OBSIDIAN",
     tagline: "Cliffside Panorama",
     location: "Pedregal Cliffs · 7 BR",
     image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=900&q=90&auto=format&fit=crop",
-    msg: "Hi, I'm interested in Villa Obsidian — the cliffside panorama estate.",
+    msg: "",
   },
   {
     id: "petra",
+    slug: "casa-petra",
     name: "CASA PETRA",
     tagline: "Private Beach Access",
     location: "Cabo San Lucas · 4 BR",
     image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=90&auto=format&fit=crop",
-    msg: "Hi, I'd like to book Casa Petra with private beach access.",
+    msg: "",
   },
   {
     id: "aurora",
+    slug: "villa-aurora",
     name: "VILLA AURORA",
     tagline: "Three Pools · Sunset Views",
     location: "Hillside Reserve · 6 BR",
     image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=900&q=90&auto=format&fit=crop",
-    msg: "Hi, I want to inquire about Villa Aurora — the hillside property with three pools.",
+    msg: "",
   },
 ];
 
@@ -85,7 +88,7 @@ export default function VillasSection() {
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.25 }}
-          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi, I'd like to see all available villas in Los Cabos.")}`}
+          href="https://wa.me/526241234567?text=Hi%2C%20I'd%20like%20to%20see%20all%20available%20villas%20in%20Los%20Cabos."
           target="_blank"
           rel="noopener noreferrer"
           className="self-start text-[9px] tracking-[0.28em] text-[#3A3028] uppercase hover:text-[#C4A45A] transition-colors duration-300 hover-line pb-0.5"
@@ -123,7 +126,6 @@ export default function VillasSection() {
 function VillaCard({ villa, index }: { villa: (typeof villas)[0]; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-40px" });
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(villa.msg)}`;
 
   return (
     <motion.div
@@ -133,7 +135,7 @@ function VillaCard({ villa, index }: { villa: (typeof villas)[0]; index: number 
       transition={{ duration: 0.8, delay: index * 0.09, ease: [0.16, 1, 0.3, 1] }}
       className="flex-shrink-0 w-[82vw] md:w-[380px] lg:w-[420px] group"
     >
-      <a href={url} target="_blank" rel="noopener noreferrer" className="block">
+      <Link href={`/villas/${villa.slug}`} className="block">
         {/* Full-bleed image card */}
         <div className="relative overflow-hidden"
           style={{ height: "clamp(320px, 70vw, 520px)" }}
@@ -176,7 +178,7 @@ function VillaCard({ villa, index }: { villa: (typeof villas)[0]; index: number 
           {/* WhatsApp hover overlay */}
           <div className="absolute inset-0 bg-[#C4A45A]/0 group-hover:bg-[#C4A45A]/5 transition-colors duration-500" />
         </div>
-      </a>
+      </Link>
     </motion.div>
   );
 }

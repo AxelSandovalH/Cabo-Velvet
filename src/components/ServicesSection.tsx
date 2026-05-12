@@ -3,40 +3,39 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
-
-const WHATSAPP_NUMBER = "526241234567";
+import Link from "next/link";
 
 const services = [
   {
     id: "nightlife",
+    slug: "nightlife",
     label: "VIP ACCESS",
     title: "Nightlife",
     image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&q=85&auto=format&fit=crop",
-    msg: "Hi, I need VIP nightlife access in Los Cabos.",
     size: "large",
   },
   {
     id: "transport",
+    slug: "transport",
     label: "24 / 7 FLEET",
     title: "Transport",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=85&auto=format&fit=crop",
-    msg: "Hi, I need luxury ground transportation in Los Cabos.",
     size: "small",
   },
   {
     id: "atv",
+    slug: "adventures",
     label: "BAJA DESERT",
     title: "Adventures",
     image: "https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=800&q=85&auto=format&fit=crop",
-    msg: "Hi, I'm interested in ATV and adventure experiences in Los Cabos.",
     size: "small",
   },
   {
     id: "concierge",
+    slug: "concierge",
     label: "FULLY BESPOKE",
     title: "Concierge",
     image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=85&auto=format&fit=crop",
-    msg: "Hi, I have a special request for a bespoke concierge experience in Los Cabos.",
     size: "large",
   },
 ];
@@ -89,7 +88,7 @@ export default function ServicesSection() {
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.25 }}
-            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi, I'd like to plan my full Cabo Velvet experience.")}`}
+            href="https://wa.me/526241234567?text=Hi%2C%20I'd%20like%20to%20plan%20my%20full%20Cabo%20Velvet%20experience."
             target="_blank"
             rel="noopener noreferrer"
             className="self-start text-[9px] tracking-[0.28em] text-[#3A3028] uppercase hover:text-[#C4A45A] transition-colors duration-300 hover-line pb-0.5"
@@ -128,7 +127,6 @@ function ServiceCard({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(service.msg)}`;
 
   return (
     <motion.div
@@ -139,7 +137,7 @@ function ServiceCard({
       className={`group relative overflow-hidden ${className}`}
       style={{ height: tall ? "clamp(300px, 55vw, 480px)" : "clamp(180px, 30vw, 230px)" }}
     >
-      <a href={url} target="_blank" rel="noopener noreferrer" className="block h-full">
+      <Link href={`/services/${service.slug}`} className="block h-full">
         <Image
           src={service.image}
           alt={service.title}
@@ -170,7 +168,7 @@ function ServiceCard({
 
         {/* Gold tint on hover */}
         <div className="absolute inset-0 bg-[#C4A45A]/0 group-hover:bg-[#C4A45A]/6 transition-colors duration-500" />
-      </a>
+      </Link>
     </motion.div>
   );
 }
