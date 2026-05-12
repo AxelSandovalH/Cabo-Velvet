@@ -1,26 +1,223 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-cormorant);
   --font-mono: var(--font-geist-mono);
+  --color-gold: var(--gold);
+  --color-gold-muted: var(--gold-muted);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border-subtle: var(--border-subtle);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* Luxury dark palette — forced dark, no light mode */
+  --background: #080808;
+  --foreground: #F2EDE4;
+  --surface: #0F0F0F;
+  --surface-2: #161616;
+  --gold: #C4A45A;
+  --gold-muted: #8B7240;
+  --card: #0F0F0F;
+  --card-foreground: #F2EDE4;
+  --popover: #111111;
+  --popover-foreground: #F2EDE4;
+  --primary: #C4A45A;
+  --primary-foreground: #080808;
+  --secondary: #161616;
+  --secondary-foreground: #F2EDE4;
+  --muted: #1A1A1A;
+  --muted-foreground: #6B6458;
+  --accent: #1E1A14;
+  --accent-foreground: #C4A45A;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: rgba(255, 255, 255, 0.06);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #C4A45A;
+  --radius: 0.25rem;
+}
+
+/* Force dark mode globally */
+html {
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    background-color: #080808;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #080808;
+    color: #F2EDE4;
+    font-family: var(--font-inter), system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: rgba(196, 164, 90, 0.25);
+    color: #F2EDE4;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #080808;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2A2520;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #C4A45A;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Utility classes for luxury design */
+.font-display {
+  font-family: var(--font-cormorant), 'Georgia', serif;
+}
+
+.text-gold {
+  color: #C4A45A;
+}
+
+.bg-gold {
+  background-color: #C4A45A;
+}
+
+.border-gold {
+  border-color: #C4A45A;
+}
+
+/* Cinematic text animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 1.2s ease forwards;
+}
+
+/* Gold shimmer text effect */
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #C4A45A 0%,
+    #F0D080 40%,
+    #C4A45A 60%,
+    #8B7240 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(15, 15, 15, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Luxury hover line effect */
+.hover-line {
+  position: relative;
+}
+.hover-line::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #C4A45A;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-line:hover::after {
+  width: 100%;
+}
+
+/* Image overlay for cinematic effect */
+.cinematic-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(8, 8, 8, 0.2) 0%,
+    rgba(8, 8, 8, 0.1) 30%,
+    rgba(8, 8, 8, 0.5) 70%,
+    rgba(8, 8, 8, 0.95) 100%
+  );
+}
+
+/* Noise texture overlay */
+.noise-overlay {
+  position: relative;
+}
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.4;
 }
