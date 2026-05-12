@@ -2,157 +2,171 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
 
 const WHATSAPP_NUMBER = "526241234567";
 const WHATSAPP_MSG = encodeURIComponent(
-  "Hi, I'd like to inquire about a luxury experience in Los Cabos."
+  "Hi, I'd like to book a luxury experience in Los Cabos."
 );
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`;
-
-const navLinks = [
-  { label: "Yachts", href: "#services" },
-  { label: "Villas", href: "#services" },
-  { label: "Experiences", href: "#experiences" },
-  { label: "Nightlife", href: "#services" },
-];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const onScroll = () => setScrolled(window.scrollY > 80);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Lock body scroll when menu open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
   return (
     <>
       <motion.nav
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? "bg-[#080808]/90 backdrop-blur-xl border-b border-white/[0.04]"
+            ? "bg-[#080808]/92 backdrop-blur-xl border-b border-white/[0.05]"
             : "bg-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-10 h-16 md:h-20 flex items-center justify-between">
-          {/* Logo */}
-          <a href="#" className="flex flex-col leading-none group">
-            <span
-              className="font-display text-xl md:text-2xl font-light tracking-[0.2em] text-[#F2EDE4] uppercase"
-              style={{ fontFamily: "var(--font-cormorant)" }}
-            >
-              Cabo Velvet
-            </span>
-            <span className="text-[9px] tracking-[0.35em] text-[#C4A45A] uppercase font-light mt-0.5">
-              Los Cabos
+        <div className="h-16 md:h-20 flex items-center justify-between px-5 md:px-12 lg:px-16">
+          {/* Hamburger — left */}
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="flex flex-col gap-[5px] p-2 group"
+            aria-label="Menu"
+          >
+            <span className="block w-5 h-px bg-[#F2EDE4]/70 group-hover:bg-[#C4A45A] transition-colors duration-300" />
+            <span className="block w-3.5 h-px bg-[#F2EDE4]/50 group-hover:bg-[#C4A45A] transition-colors duration-300" />
+          </button>
+
+          {/* Book CTA — right */}
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-0 border border-[#F2EDE4]/25 hover:border-[#C4A45A]/60 transition-colors duration-300 group"
+          >
+            <span className="px-5 py-2.5 text-[10px] tracking-[0.28em] text-[#F2EDE4]/80 group-hover:text-[#C4A45A] uppercase transition-colors duration-300">
+              Book
             </span>
           </a>
-
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="text-[11px] tracking-[0.18em] uppercase text-[#9A9080] hover:text-[#F2EDE4] transition-colors duration-300 hover-line"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-
-          {/* CTA + mobile menu */}
-          <div className="flex items-center gap-4">
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:flex items-center gap-2 px-5 py-2.5 border border-[#C4A45A]/40 text-[#C4A45A] text-[10px] tracking-[0.2em] uppercase font-medium hover:bg-[#C4A45A] hover:text-[#080808] transition-all duration-300"
-            >
-              <WhatsAppIcon />
-              Book Now
-            </a>
-
-            <button
-              onClick={() => setMobileOpen(true)}
-              className="md:hidden p-2 text-[#9A9080] hover:text-[#F2EDE4] transition-colors"
-              aria-label="Open menu"
-            >
-              <Menu size={20} />
-            </button>
-          </div>
         </div>
       </motion.nav>
 
-      {/* Mobile menu */}
+      {/* Full-screen mobile menu — editorial dark */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[60] bg-[#080808]"
-          >
-            <div className="flex flex-col h-full px-6 py-6">
-              <div className="flex justify-between items-center">
-                <span
-                  className="font-display text-xl tracking-[0.2em] uppercase text-[#F2EDE4]"
-                  style={{ fontFamily: "var(--font-cormorant)" }}
-                >
-                  Cabo Velvet
-                </span>
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-[60] bg-[#080808]/60 backdrop-blur-sm"
+              onClick={() => setMobileOpen(false)}
+            />
+
+            {/* Drawer */}
+            <motion.div
+              key="drawer"
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="fixed top-0 left-0 bottom-0 z-[70] w-[85vw] max-w-sm bg-[#080808] flex flex-col border-r border-white/[0.05]"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-6 border-b border-white/[0.05]">
+                <div>
+                  <p
+                    className="font-display text-lg tracking-[0.12em] text-[#F2EDE4] uppercase font-light"
+                    style={{ fontFamily: "var(--font-cormorant)" }}
+                  >
+                    Cabo Velvet
+                  </p>
+                  <p className="text-[8px] tracking-[0.38em] text-[#C4A45A] uppercase mt-0.5">
+                    Los Cabos
+                  </p>
+                </div>
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="p-2 text-[#9A9080]"
-                  aria-label="Close menu"
+                  className="p-2 text-[#4A4038] hover:text-[#F2EDE4] transition-colors"
+                  aria-label="Close"
                 >
-                  <X size={20} />
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
-              <div className="flex flex-col justify-center flex-1 gap-8">
-                {navLinks.map((link, i) => (
+              {/* Nav links */}
+              <nav className="flex-1 flex flex-col justify-center px-6 gap-1">
+                {[
+                  { label: "Villas", sub: "Private Residences", anchor: "#villas" },
+                  { label: "Yachts", sub: "Fleet & Charters", anchor: "#yachts" },
+                  { label: "Experiences", sub: "Curated Moments", anchor: "#experiences" },
+                  { label: "Nightlife", sub: "VIP Access", anchor: "#services" },
+                  { label: "Transport", sub: "Ground Fleet", anchor: "#services" },
+                  { label: "Concierge", sub: "Whatever You Need", anchor: "#services" },
+                ].map((item, i) => (
                   <motion.a
-                    key={link.label}
-                    href={link.href}
-                    initial={{ x: -20, opacity: 0 }}
+                    key={item.label}
+                    href={item.anchor}
+                    initial={{ x: -16, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: i * 0.08 + 0.1 }}
+                    transition={{ delay: 0.1 + i * 0.06, duration: 0.4 }}
                     onClick={() => setMobileOpen(false)}
-                    className="font-display text-4xl font-light tracking-wide text-[#F2EDE4] border-b border-white/[0.06] pb-4"
-                    style={{ fontFamily: "var(--font-cormorant)" }}
+                    className="group flex items-center justify-between py-4 border-b border-white/[0.04] hover:border-[#C4A45A]/20 transition-colors"
                   >
-                    {link.label}
+                    <div>
+                      <p
+                        className="font-display text-2xl font-light text-[#F2EDE4] group-hover:text-[#C4A45A] transition-colors duration-300"
+                        style={{ fontFamily: "var(--font-cormorant)" }}
+                      >
+                        {item.label}
+                      </p>
+                      <p className="text-[9px] tracking-[0.22em] text-[#3A3028] uppercase mt-0.5">
+                        {item.sub}
+                      </p>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3A3028" strokeWidth="1" className="group-hover:stroke-[#C4A45A] transition-colors">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
                   </motion.a>
                 ))}
+              </nav>
 
+              {/* Bottom CTA */}
+              <div className="px-6 py-8 border-t border-white/[0.05]">
                 <motion.a
                   href={WHATSAPP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="mt-4 flex items-center justify-center gap-2 py-4 bg-[#C4A45A] text-[#080808] text-[11px] tracking-[0.25em] uppercase font-semibold"
+                  transition={{ delay: 0.55 }}
+                  className="flex items-center justify-center gap-2.5 py-4 bg-[#C4A45A] text-[#080808] text-[10px] tracking-[0.28em] uppercase font-semibold hover:bg-[#D4B468] transition-colors"
                 >
                   <WhatsAppIcon />
                   Book Your Experience
                 </motion.a>
-              </div>
-
-              <div className="pb-4">
-                <p className="text-[10px] tracking-[0.2em] text-[#4A4038] uppercase text-center">
-                  Los Cabos · Baja California Sur
+                <p className="text-[9px] tracking-[0.2em] text-[#2A2018] uppercase text-center mt-4">
+                  Los Cabos · BCS · México
                 </p>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
