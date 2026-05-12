@@ -75,17 +75,26 @@ html {
   }
 
   html {
-    background-color: #080808;
+    background-color: #060606;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    background-color: #080808;
+    background-color: #060606;
     color: #F2EDE4;
     font-family: var(--font-inter), system-ui, sans-serif;
     overflow-x: hidden;
+    /* Space for mobile sticky bar */
+    padding-bottom: 0;
+  }
+
+  /* Mobile: add bottom padding so content isn't hidden behind the sticky bar */
+  @media (max-width: 767px) {
+    body {
+      padding-bottom: 60px;
+    }
   }
 
   ::selection {

@@ -8,11 +8,11 @@ import ServicesSection from "@/components/ServicesSection";
 import StatsSection from "@/components/StatsSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
-import WhatsAppSticky from "@/components/WhatsAppSticky";
+import MobileBar from "@/components/MobileBar";
 
 export default function HomePage() {
   return (
-    <main className="bg-[#080808]">
+    <main className="bg-[#060606]">
       <Navbar />
       <HeroSection />
       <CategoryBar />
@@ -23,7 +23,8 @@ export default function HomePage() {
       <StatsSection />
       <CTASection />
       <Footer />
-      <WhatsAppSticky />
+      {/* MobileBar: full-width bottom strip on mobile, floating pill on desktop */}
+      <MobileBar />
     </main>
   );
 }
