@@ -9,21 +9,30 @@ import StatsSection from "@/components/StatsSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
+import { fetchListingsByCategory } from "@/lib/listings";
 
-export default function HomePage() {
+export const revalidate = 60
+
+export default async function HomePage() {
+  const [villas, yachts, experiences, services] = await Promise.all([
+    fetchListingsByCategory('villa'),
+    fetchListingsByCategory('yacht'),
+    fetchListingsByCategory('experience'),
+    fetchListingsByCategory('service'),
+  ])
+
   return (
     <main className="bg-[#060606]">
       <Navbar />
       <HeroSection />
       <CategoryBar />
-      <VillasSection />
-      <YachtsSection />
-      <ExperiencesSection />
-      <ServicesSection />
+      <VillasSection listings={villas} />
+      <YachtsSection listings={yachts} />
+      <ExperiencesSection listings={experiences} />
+      <ServicesSection listings={services} />
       <StatsSection />
       <CTASection />
       <Footer />
-      {/* MobileBar: full-width bottom strip on mobile, floating pill on desktop */}
       <MobileBar />
     </main>
   );
