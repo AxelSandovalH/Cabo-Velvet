@@ -36,7 +36,8 @@ export const tools: Anthropic.Tool[] = [
         tagline: { type: 'string' },
         location: { type: 'string' },
         description: { type: 'string' },
-        price: { type: 'number' },
+        price: { type: 'number', description: 'Published price (what clients pay)' },
+        agency_price: { type: 'number', description: 'Agency cost price (what the admin pays the agency)' },
         price_unit: { type: 'string', description: 'e.g. per night, per day, per person' },
         price_notes: { type: 'string' },
         contact_name: { type: 'string' },
@@ -60,7 +61,8 @@ export const tools: Anthropic.Tool[] = [
         tagline: { type: 'string' },
         location: { type: 'string' },
         description: { type: 'string' },
-        price: { type: 'number' },
+        price: { type: 'number', description: 'Published price (what clients pay)' },
+        agency_price: { type: 'number', description: 'Agency cost price (what the admin pays the agency)' },
         price_unit: { type: 'string' },
         price_notes: { type: 'string' },
         contact_name: { type: 'string' },
@@ -180,7 +182,7 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
         }
         let q = supabase
           .from('listings')
-          .select('id, name, category, tagline, location, price, price_unit, active')
+          .select('id, name, category, tagline, location, price, agency_price, price_unit, active')
           .eq('active', active)
         if (category) q = q.eq('category', category)
         if (query) q = q.or(`name.ilike.%${query}%,tagline.ilike.%${query}%,description.ilike.%${query}%`)
