@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -33,7 +33,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#080808]">
       <div className="w-full max-w-sm px-8 py-10 bg-[#111] rounded-2xl border border-white/10">
         <h1 className="text-2xl font-semibold text-[#F2EDE4] mb-8 text-center tracking-wide">
-          Cabo Velvet Admin
+          Cabo Rico Admin
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input

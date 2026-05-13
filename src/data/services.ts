@@ -1,4 +1,4 @@
-export interface Service {
+﻿export interface Service {
   slug: string;
   label: string;
   name: string;
@@ -27,7 +27,7 @@ export const services: Service[] = [
       "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=85&auto=format&fit=crop",
     ],
     description: [
-      "Cabo San Lucas has a nightlife culture unlike anywhere else in Mexico — a confluence of world-class DJs, open-air venues, and a clientele that has come to spend. But the experience is entirely different when you arrive as a Cabo Velvet guest. No lines. No waiting on the host. No table in the corner. You are expected, and your evening is prepared.",
+      "Cabo San Lucas has a nightlife culture unlike anywhere else in Mexico — a confluence of world-class DJs, open-air venues, and a clientele that has come to spend. But the experience is entirely different when you arrive as a Cabo Rico guest. No lines. No waiting on the host. No table in the corner. You are expected, and your evening is prepared.",
       "We maintain relationships with every premier venue in the corridor — Taboo, Bagatelle, Omnia, Pink Kitty, and the private members clubs that don't appear on any map. Tell us your group size, your preferred vibe, your budget, and the date. We handle the table, the reservation, the bottle service, and the arrival.",
     ],
     specs: [
@@ -64,7 +64,7 @@ export const services: Service[] = [
       "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=85&auto=format&fit=crop",
     ],
     description: [
-      "The Cabo Velvet ground fleet is available around the clock — airport transfers, hotel runs, sunset drives down the corridor, and all-day chauffeur service for groups of any size. Every vehicle is late-model, climate-controlled, and driven by a professional who knows Los Cabos intimately and treats discretion as standard.",
+      "The Cabo Rico ground fleet is available around the clock — airport transfers, hotel runs, sunset drives down the corridor, and all-day chauffeur service for groups of any size. Every vehicle is late-model, climate-controlled, and driven by a professional who knows Los Cabos intimately and treats discretion as standard.",
       "For large groups arriving together, our Mercedes Sprinter vans accommodate up to 14 passengers with luggage — the same vehicles used for celebrity and executive transport throughout Baja. For couples and small groups, our Escalade and Suburban fleet arrives polished and on time, without exception.",
     ],
     specs: [
@@ -139,7 +139,7 @@ export const services: Service[] = [
       "https://images.unsplash.com/photo-1543158266-0066955a5f89?w=1200&q=85&auto=format&fit=crop",
     ],
     description: [
-      "Every Cabo Velvet booking comes with a dedicated concierge. But this service goes further. For guests who want every detail of their stay arranged before they arrive — restaurant reservations, in-villa spa treatments, surprise proposal setups, baby shower florals, custom excursion itineraries, musician bookings, and anything else that can be imagined — our bespoke concierge team is the answer.",
+      "Every Cabo Rico booking comes with a dedicated concierge. But this service goes further. For guests who want every detail of their stay arranged before they arrive — restaurant reservations, in-villa spa treatments, surprise proposal setups, baby shower florals, custom excursion itineraries, musician bookings, and anything else that can be imagined — our bespoke concierge team is the answer.",
       "We have spent years building relationships with the best chefs, the most talented florists, the most discreet security services, and the most capable private event producers in Los Cabos. If it can be done in Baja, we can arrange it. If it has never been done before in Baja, we will figure out how.",
     ],
     specs: [

@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 
 const WHATSAPP_NUMBER = "526241234567";
-const WHATSAPP_MSG = encodeURIComponent("Hi, I'd like to learn more about Cabo Velvet.");
+const WHATSAPP_MSG = encodeURIComponent("Hi, I'd like to learn more about Cabo Rico.");
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`;
 
 const footerLinks = {
@@ -34,7 +34,7 @@ export default function Footer() {
                 className="font-display text-2xl tracking-[0.2em] text-[#F2EDE4] uppercase font-light"
                 style={{ fontFamily: "var(--font-cormorant)" }}
               >
-                Cabo Velvet
+                Cabo Rico
               </p>
               <p className="text-[9px] tracking-[0.35em] text-[#C4A45A] uppercase mt-1">
                 Los Cabos
@@ -87,7 +87,7 @@ export default function Footer() {
       <div className="border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-[#2A2218] text-[10px] tracking-[0.15em] uppercase">
-            © {year} Cabo Velvet. All rights reserved.
+            © {year} Cabo Rico. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a href="#" className="text-[#2A2218] text-[10px] tracking-[0.15em] uppercase hover:text-[#4A4038] transition-colors">

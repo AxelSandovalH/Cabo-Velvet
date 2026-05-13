@@ -1,9 +1,9 @@
-import Anthropic from '@anthropic-ai/sdk'
+﻿import Anthropic from '@anthropic-ai/sdk'
 import { tools, executeTool } from './tools'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-const SYSTEM_PROMPT = `Eres el asistente administrativo de Cabo Velvet, un directorio de lujo en Los Cabos, México.
+const SYSTEM_PROMPT = `Eres el asistente administrativo de Cabo Rico, un directorio de lujo en Los Cabos, México.
 
 Tu función es ayudar al administrador a gestionar la base de datos a través de WhatsApp. Puedes:
 - Buscar, crear y actualizar listings (villas, yates, experiencias, servicios)

@@ -1,4 +1,4 @@
-export interface Yacht {
+﻿export interface Yacht {
   slug: string;
   name: string;
   tagline: string;
@@ -27,7 +27,7 @@ export const yachts: Yacht[] = [
       "https://images.unsplash.com/photo-1534190760961-74e8c1c5c3da?w=1200&q=85&auto=format&fit=crop",
     ],
     description: [
-      "The flagship of the Cabo Velvet fleet — a 120-foot Benetti superyacht that redefines what a charter in the Sea of Cortez can be. Four cabin suites accommodate up to ten guests in the kind of space usually reserved for private ownership. The main deck salon is climate-controlled, the sundeck has a bar and jacuzzi, and the swim platform launches directly into some of the most biodiverse waters in the world.",
+      "The flagship of the Cabo Rico fleet — a 120-foot Benetti superyacht that redefines what a charter in the Sea of Cortez can be. Four cabin suites accommodate up to ten guests in the kind of space usually reserved for private ownership. The main deck salon is climate-controlled, the sundeck has a bar and jacuzzi, and the swim platform launches directly into some of the most biodiverse waters in the world.",
       "Every charter is staffed by a full professional crew: captain, first mate, chef, and two deckhands. Routes are custom-planned around your interests — whether that's diving the seamounts, anchoring in a hidden cove for lunch, arriving at El Arco at sunrise, or cruising slowly past the arch as the sun sets into the Pacific.",
     ],
     specs: [
@@ -67,7 +67,7 @@ export const yachts: Yacht[] = [
     ],
     description: [
       "The Horizon 85 is the most versatile vessel in the fleet — equally suited to a private sunset cruise for two as it is to a full-day adventure for eight. Three cabin suites and a full-beam master make it a genuine overnight option, while the expansive flybridge is the best seat in the Sea of Cortez for watching the sun drop below the Pacific.",
-      "Day charters on the Horizon 85 are a Cabo Velvet signature experience. The crew knows every anchorage, every fishing spot, every secret cove between the marina and Land's End. Lunch is served on the swim platform. The bar never closes. And the route is always, entirely, yours to decide.",
+      "Day charters on the Horizon 85 are a Cabo Rico signature experience. The crew knows every anchorage, every fishing spot, every secret cove between the marina and Land's End. Lunch is served on the swim platform. The bar never closes. And the route is always, entirely, yours to decide.",
     ],
     specs: [
       { label: "Length", value: "85 ft" },
@@ -144,7 +144,7 @@ export const yachts: Yacht[] = [
       "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=1200&q=85&auto=format&fit=crop",
     ],
     description: [
-      "The Deep Blue is Cabo Velvet's sailing catamaran — the widest, most stable platform in the fleet, and the best choice for larger groups who want to feel the wind rather than the engine. At 48 feet with twin hulls, the beam is nearly as wide as many yachts are long. The result is a deck space that genuinely allows fourteen people to spread out and claim their own corner of the boat.",
+      "The Deep Blue is Cabo Rico's sailing catamaran — the widest, most stable platform in the fleet, and the best choice for larger groups who want to feel the wind rather than the engine. At 48 feet with twin hulls, the beam is nearly as wide as many yachts are long. The result is a deck space that genuinely allows fourteen people to spread out and claim their own corner of the boat.",
       "Catamarans are the preferred vessel for snorkeling excursions, sunset sails, and birthday charters where everyone wants to be on deck at the same time. The twin hulls create a shaded hammock net at the bow — the most coveted spot on any catamaran in the Sea of Cortez — while the stern platform is perfect for those who want to be in the water at every opportunity.",
     ],
     specs: [

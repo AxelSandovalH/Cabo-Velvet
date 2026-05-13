@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -299,7 +299,7 @@ export default function LuxuryDetailLayout({
           className="font-display text-sm tracking-[0.2em] text-[#3A3028] uppercase hover:text-[#C4A45A] transition-colors"
           style={{ fontFamily: "var(--font-cormorant)" }}
         >
-          ← Cabo Velvet
+          ← Cabo Rico
         </Link>
         <span className="text-[8px] tracking-[0.25em] text-[#2A2018] uppercase">
           Los Cabos · BCS · México

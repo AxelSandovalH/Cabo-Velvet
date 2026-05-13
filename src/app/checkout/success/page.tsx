@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 
 export default function SuccessPage() {
   return (
@@ -23,7 +23,7 @@ export default function SuccessPage() {
           href="/"
           className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] text-[#C4A45A] uppercase hover:text-[#F2EDE4] transition-colors"
         >
-          ← Return to Cabo Velvet
+          ← Return to Cabo Rico
         </Link>
       </div>
     </div>

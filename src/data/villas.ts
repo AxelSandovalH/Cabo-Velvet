@@ -1,4 +1,4 @@
-export interface Villa {
+﻿export interface Villa {
   slug: string;
   name: string;
   tagline: string;
@@ -43,7 +43,7 @@ export const villas: Villa[] = [
       "Full housekeeping twice daily",
       "Infinity pool & jacuzzi",
       "Airport transfers (both ways)",
-      "Dedicated Cabo Velvet concierge",
+      "Dedicated Cabo Rico concierge",
       "Welcome champagne & curated pantry",
       "Luxury linens & bath amenities",
       "All utilities & WiFi",
@@ -121,7 +121,7 @@ export const villas: Villa[] = [
       "Beach butler & palapa service",
       "Kayaks, paddleboards & snorkel gear",
       "Airport transfers",
-      "Cabo Velvet concierge",
+      "Cabo Rico concierge",
       "Welcome provisions & beach bar setup",
       "Housekeeping daily",
       "All utilities & high-speed WiFi",

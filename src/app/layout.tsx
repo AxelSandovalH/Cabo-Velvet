@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+﻿import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Cabo Velvet — Luxury Concierge Los Cabos",
+  title: "Cabo Rico — Luxury Concierge Los Cabos",
   description:
     "Private yachts, villas, nightlife, and bespoke experiences in Los Cabos. The most exclusive concierge service in Baja.",
   keywords: [
@@ -37,15 +37,15 @@ export const metadata: Metadata = {
     "luxury travel mexico",
   ],
   openGraph: {
-    title: "Cabo Velvet — Luxury Concierge Los Cabos",
+    title: "Cabo Rico — Luxury Concierge Los Cabos",
     description: "Private yachts, villas, nightlife & bespoke experiences.",
-    siteName: "Cabo Velvet",
+    siteName: "Cabo Rico",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cabo Velvet — Luxury Concierge Los Cabos",
+    title: "Cabo Rico — Luxury Concierge Los Cabos",
     description: "Private yachts, villas, nightlife & bespoke experiences.",
   },
   robots: {

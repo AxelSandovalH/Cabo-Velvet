@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation'
+﻿import { redirect } from 'next/navigation'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import ImageManager from './ImageManager'
 
@@ -24,7 +24,7 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#080808] text-[#F2EDE4]">
       <header className="border-b border-white/10 px-8 py-5 flex items-center justify-between">
-        <h1 className="text-xl font-semibold tracking-wide">Cabo Velvet — Imágenes</h1>
+        <h1 className="text-xl font-semibold tracking-wide">Cabo Rico — Imágenes</h1>
         <form action="/api/admin/logout" method="POST">
           <button className="text-sm text-white/40 hover:text-white/80 transition-colors">
             Cerrar sesión

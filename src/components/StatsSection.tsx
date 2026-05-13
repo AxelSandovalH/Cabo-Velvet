@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef, useEffect } from "react";
@@ -13,21 +13,21 @@ const stats = [
 const testimonials = [
   {
     quote:
-      "Cabo Velvet turned our bachelorette into a once-in-a-lifetime journey. Every detail — the yacht, the villa, the table at Taboo — was flawless.",
+      "Cabo Rico turned our bachelorette into a once-in-a-lifetime journey. Every detail — the yacht, the villa, the table at Taboo — was flawless.",
     author: "Ashley M.",
     origin: "Los Angeles, CA",
     tag: "Bachelorette Group · 12 guests",
   },
   {
     quote:
-      "I've used concierge services in Monaco and Mykonos. Cabo Velvet is in that league. Fast, discreet, and genuinely luxurious.",
+      "I've used concierge services in Monaco and Mykonos. Cabo Rico is in that league. Fast, discreet, and genuinely luxurious.",
     author: "James R.",
     origin: "New York, NY",
     tag: "Yacht Charter · 5 days",
   },
   {
     quote:
-      "The ATV desert dinner was the highlight of our entire trip. No app or website could have planned this — only Cabo Velvet.",
+      "The ATV desert dinner was the highlight of our entire trip. No app or website could have planned this — only Cabo Rico.",
     author: "Sofia & Luca",
     origin: "Miami, FL",
     tag: "Couples Experience",

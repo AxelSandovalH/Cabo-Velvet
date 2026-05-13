@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -93,7 +93,7 @@ export default function Navbar() {
                     className="font-display text-lg tracking-[0.12em] text-[#F2EDE4] uppercase font-light"
                     style={{ fontFamily: "var(--font-cormorant)" }}
                   >
-                    Cabo Velvet
+                    Cabo Rico
                   </p>
                   <p className="text-[8px] tracking-[0.38em] text-[#C4A45A] uppercase mt-0.5">
                     Los Cabos
