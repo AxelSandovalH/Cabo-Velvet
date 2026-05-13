@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import CheckoutButton from "./CheckoutButton";
 
 interface Spec { label: string; value: string }
 
@@ -22,6 +23,7 @@ interface Props {
   price: string;
   durationOrStay: string;
   whatsappMsg: string;
+  listingId?: string;
 }
 
 const WHATSAPP_NUMBER = "526241234567";
@@ -42,6 +44,7 @@ export default function LuxuryDetailLayout({
   price,
   durationOrStay,
   whatsappMsg,
+  listingId,
 }: Props) {
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMsg)}`;
   const sub = location ?? model ?? "";
@@ -266,18 +269,21 @@ export default function LuxuryDetailLayout({
               {durationOrStay}
             </p>
 
-            {/* WhatsApp CTA */}
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative inline-flex items-center gap-3 px-10 py-5 bg-[#C4A45A] text-[#060606] text-[11px] tracking-[0.28em] uppercase font-semibold overflow-hidden hover:bg-[#D4B468] transition-colors duration-300 mb-5"
-            >
-              <span className="absolute inset-0 bg-white/10 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-700 skew-x-12" />
-              <WhatsAppIcon />
-              <span className="relative">Inquire on WhatsApp</span>
-              <ArrowIcon />
-            </a>
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-5">
+              {listingId && <CheckoutButton listingId={listingId} />}
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative inline-flex items-center gap-3 px-10 py-5 bg-[#C4A45A] text-[#060606] text-[11px] tracking-[0.28em] uppercase font-semibold overflow-hidden hover:bg-[#D4B468] transition-colors duration-300"
+              >
+                <span className="absolute inset-0 bg-white/10 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-700 skew-x-12" />
+                <WhatsAppIcon />
+                <span className="relative">Inquire on WhatsApp</span>
+                <ArrowIcon />
+              </a>
+            </div>
 
             <p className="text-[8.5px] tracking-[0.22em] text-[#2A2018] uppercase">
               Instant response · No booking fees · 100% private
