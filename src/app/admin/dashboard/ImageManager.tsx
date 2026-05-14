@@ -9,6 +9,7 @@ type Listing = {
   name: string
   category: string
   images: string[] | null
+  provider?: { id: string; name: string } | null
 }
 
 export default function ImageManager({ listing }: { listing: Listing }) {
