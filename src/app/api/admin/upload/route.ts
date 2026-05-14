@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import sharp from 'sharp'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { supabase as adminSupabase } from '@/lib/supabase'
 
 export async function POST(req: NextRequest) {
-  // Verify the user is authenticated
   const serverClient = await createSupabaseServer()
   const { data: { user } } = await serverClient.auth.getUser()
   if (!user) {
@@ -18,20 +18,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing file or listingId' }, { status: 400 })
   }
 
-  // Normalize extension — iPhones sometimes send .jpeg, .HEIC, etc.
-  const originalName = file.name ?? 'photo'
-  const ext = originalName.split('.').pop()?.toLowerCase() ?? 'jpg'
-  const safeExt = ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif', 'avif'].includes(ext) ? ext : 'jpg'
-
-  const path = `${listingId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${safeExt}`
-
   const arrayBuffer = await file.arrayBuffer()
-  const buffer = Buffer.from(arrayBuffer)
+  const inputBuffer = Buffer.from(arrayBuffer)
+
+  // Compress: max 1200px wide, JPEG 80%, strip metadata
+  let compressed: Buffer
+  try {
+    compressed = await sharp(inputBuffer)
+      .rotate()                          // auto-rotate from EXIF (fixes iPhone sideways photos)
+      .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
+      .jpeg({ quality: 80, mozjpeg: true })
+      .toBuffer()
+  } catch {
+    // If sharp can't parse it (rare), fall back to original
+    compressed = inputBuffer
+  }
+
+  const path = `${listingId}/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`
 
   const { error: uploadError } = await adminSupabase.storage
     .from('listings')
-    .upload(path, buffer, {
-      contentType: file.type || 'image/jpeg',
+    .upload(path, compressed, {
+      contentType: 'image/jpeg',
       upsert: false,
     })
 
@@ -41,6 +49,5 @@ export async function POST(req: NextRequest) {
   }
 
   const { data } = adminSupabase.storage.from('listings').getPublicUrl(path)
-
   return NextResponse.json({ url: data.publicUrl })
 }
