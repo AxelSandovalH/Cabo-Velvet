@@ -39,7 +39,6 @@ export async function POST(req: NextRequest) {
             product_data: {
               name: listing.name,
               description: listing.tagline ?? undefined,
-              images: listing.images?.slice(0, 1) ?? [],
             },
           },
         },
