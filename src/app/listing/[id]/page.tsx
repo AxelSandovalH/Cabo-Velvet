@@ -26,7 +26,7 @@ export async function generateMetadata({
   const listing = await fetchListingById(id)
   if (!listing) return { title: 'Not Found' }
   return {
-    title: `${listing.name} — Cabo Velvet`,
+    title: `${listing.name} — Cabo Rico`,
     description: listing.tagline ?? listing.description?.slice(0, 155) ?? '',
   }
 }

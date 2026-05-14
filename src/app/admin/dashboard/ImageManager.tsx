@@ -52,7 +52,7 @@ export default function ImageManager({ listing }: { listing: Listing }) {
         .eq('id', listing.id)
 
       if (dbError) {
-        setError('Error guardando en la base de datos')
+        setError('Error guardando en base de datos')
       } else {
         setImages(updated)
       }
@@ -65,10 +65,8 @@ export default function ImageManager({ listing }: { listing: Listing }) {
   async function handleDelete(url: string) {
     const supabase = createSupabaseBrowser()
 
-    // Extract storage path from URL
     const parts = url.split('/listings/')
     const path = parts[1]
-
     if (path) {
       await supabase.storage.from('listings').remove([path])
     }
@@ -82,29 +80,31 @@ export default function ImageManager({ listing }: { listing: Listing }) {
     if (!dbError) setImages(updated)
   }
 
-  const categoryLabel: Record<string, string> = {
-    villa: 'Villa',
-    yacht: 'Yacht',
-    experience: 'Experiencia',
-    service: 'Servicio',
-  }
-
   return (
-    <div className="bg-white/5 rounded-2xl border border-white/10 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <span className="text-xs text-white/40 uppercase tracking-widest">
-            {categoryLabel[listing.category] ?? listing.category}
-          </span>
-          <h2 className="text-lg font-semibold">{listing.name}</h2>
-        </div>
+    <div className="bg-white/5 rounded-xl border border-white/10 p-4 sm:p-5">
+      {/* Header — wraps on small screens */}
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <h2 className="text-sm font-semibold leading-snug flex-1 min-w-0 pr-2">
+          {listing.name}
+        </h2>
         <button
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="px-4 py-2 bg-[#F2EDE4] text-[#080808] rounded-lg text-sm font-semibold hover:bg-white transition-colors disabled:opacity-50"
+          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 bg-[#C4A45A] text-[#080808] rounded-lg text-xs font-semibold active:opacity-80 disabled:opacity-50 transition-opacity"
         >
-          {uploading ? 'Subiendo...' : '+ Subir imágenes'}
+          {uploading ? (
+            <>
+              <Spinner />
+              Subiendo…
+            </>
+          ) : (
+            <>
+              <PlusIcon />
+              Fotos
+            </>
+          )}
         </button>
+        {/* input — accept image/*, no capture so user can choose camera or library */}
         <input
           ref={inputRef}
           type="file"
@@ -115,31 +115,75 @@ export default function ImageManager({ listing }: { listing: Listing }) {
         />
       </div>
 
-      {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
+      {error && (
+        <p className="text-red-400 text-xs mb-3 bg-red-400/10 rounded px-3 py-2">{error}</p>
+      )}
 
       {images.length === 0 ? (
-        <p className="text-white/30 text-sm">Sin imágenes aún.</p>
+        <button
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="w-full border border-dashed border-white/15 rounded-lg py-8 flex flex-col items-center gap-2 text-white/30 active:bg-white/5 transition-colors"
+        >
+          <UploadIcon />
+          <span className="text-xs tracking-wide">Toca para agregar fotos</span>
+        </button>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
           {images.map((url) => (
-            <div key={url} className="relative group aspect-video rounded-lg overflow-hidden bg-white/5">
+            <div key={url} className="relative aspect-video rounded-lg overflow-hidden bg-white/5">
               <Image
                 src={url}
                 alt={listing.name}
                 fill
                 className="object-cover"
-                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                sizes="(max-width: 640px) 50vw, 33vw"
               />
-              <button
-                onClick={() => handleDelete(url)}
-                className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-red-400 text-sm font-semibold"
-              >
-                Eliminar
-              </button>
+              {/* Delete — always visible on mobile (bottom strip), hover overlay on desktop */}
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent pt-4 pb-1.5 px-2 flex justify-end sm:opacity-0 sm:hover:opacity-100 sm:bg-black/60 sm:inset-0 sm:items-center sm:justify-center sm:pb-0 sm:pt-0 sm:transition-opacity">
+                <button
+                  onClick={() => handleDelete(url)}
+                  className="text-red-400 text-[11px] font-semibold tracking-wide sm:text-sm"
+                >
+                  Eliminar
+                </button>
+              </div>
             </div>
           ))}
+          {/* Add more tile */}
+          <button
+            onClick={() => inputRef.current?.click()}
+            disabled={uploading}
+            className="aspect-video rounded-lg border border-dashed border-white/15 flex items-center justify-center text-white/30 active:bg-white/5 transition-colors disabled:opacity-40"
+          >
+            <PlusIcon size={20} />
+          </button>
         </div>
       )}
     </div>
+  )
+}
+
+function PlusIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  )
+}
+
+function UploadIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+    </svg>
+  )
+}
+
+function Spinner() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="animate-spin">
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+    </svg>
   )
 }

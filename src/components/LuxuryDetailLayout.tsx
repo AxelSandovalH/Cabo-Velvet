@@ -130,7 +130,7 @@ export default function LuxuryDetailLayout({
 
       {/* ── SPECS ROW ────────────────────────────────────── */}
       <section className="border-y border-white/[0.05] bg-[#0A0A0A]">
-        <div className="max-w-6xl mx-auto px-6 md:px-14 py-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="max-w-6xl mx-auto px-6 md:px-14 py-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
           {specs.map((spec) => (
             <div key={spec.label} className="flex flex-col gap-1">
               <span className="text-[8px] tracking-[0.35em] text-[#3A3028] uppercase">
@@ -270,13 +270,13 @@ export default function LuxuryDetailLayout({
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-5">
+            <div className="flex flex-col items-stretch sm:flex-row sm:items-center justify-center gap-3 mb-5 max-w-md mx-auto sm:max-w-none">
               {listingId && <CheckoutButton listingId={listingId} />}
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative inline-flex items-center gap-3 px-10 py-5 bg-[#C4A45A] text-[#060606] text-[11px] tracking-[0.28em] uppercase font-semibold overflow-hidden hover:bg-[#D4B468] transition-colors duration-300"
+                className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 bg-[#C4A45A] text-[#060606] text-[11px] tracking-[0.28em] uppercase font-semibold overflow-hidden hover:bg-[#D4B468] active:opacity-90 transition-colors duration-300 w-full sm:w-auto"
               >
                 <span className="absolute inset-0 bg-white/10 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-700 skew-x-12" />
                 <WhatsAppIcon />

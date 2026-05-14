@@ -25,7 +25,7 @@ export default function CheckoutButton({ listingId }: { listingId: string }) {
     <button
       onClick={handleCheckout}
       disabled={loading}
-      className="group relative inline-flex items-center gap-3 px-10 py-5 bg-[#F2EDE4] text-[#060606] text-[11px] tracking-[0.28em] uppercase font-semibold overflow-hidden hover:bg-white transition-colors duration-300 disabled:opacity-60"
+      className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 bg-[#F2EDE4] text-[#060606] text-[11px] tracking-[0.28em] uppercase font-semibold overflow-hidden hover:bg-white active:opacity-90 transition-colors duration-300 disabled:opacity-60 w-full sm:w-auto"
     >
       <span className="absolute inset-0 bg-white/20 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-700 skew-x-12" />
       <span className="relative">{loading ? 'Redirecting...' : 'Book Now'}</span>

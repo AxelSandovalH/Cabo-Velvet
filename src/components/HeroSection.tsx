@@ -72,7 +72,7 @@ export default function HeroSection() {
           >
             CABO
             <br />
-            VELVET
+            RICO
           </h1>
           <div className="flex items-center gap-2.5 mt-3">
             <div className="w-7 h-px bg-[#C4A45A]" />
