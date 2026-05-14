@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createSupabaseServer } from '@/lib/supabase-server'
+import { createSupabaseServer, createSupabaseAdmin } from '@/lib/supabase-server'
 import ImageManager from './ImageManager'
 
 type Listing = {
@@ -20,18 +20,19 @@ const CATEGORY_LABEL: Record<string, string> = {
 const CATEGORY_ORDER = ['experience', 'villa', 'yacht', 'service']
 
 export default async function DashboardPage() {
-  const supabase = await createSupabaseServer()
-
-  const { data: { user } } = await supabase.auth.getUser()
+  // Auth check with anon key client
+  const authClient = await createSupabaseServer()
+  const { data: { user } } = await authClient.auth.getUser()
   if (!user) redirect('/admin/login')
 
-  const { data: listings } = await supabase
+  // DB query with service role client
+  const db = await createSupabaseAdmin()
+  const { data: listings } = await db
     .from('listings')
     .select('id, name, category, images, providers(id, name)')
     .order('category')
     .order('name')
 
-  // Normalize the join (Supabase returns providers as object or null)
   const rows: Listing[] = (listings ?? []).map((l: Record<string, unknown>) => ({
     id: l.id as string,
     name: l.name as string,
@@ -40,9 +41,8 @@ export default async function DashboardPage() {
     provider: l.providers as { id: string; name: string } | null,
   }))
 
-  // Group: category → provider name → listings
+  // Group: category → agency → listings
   const grouped: Record<string, Record<string, Listing[]>> = {}
-
   for (const listing of rows) {
     const cat = listing.category ?? 'other'
     const agency = listing.provider?.name ?? 'Sin agencia'
@@ -68,28 +68,22 @@ export default async function DashboardPage() {
         {sortedCats.length === 0 && (
           <p className="text-white/40">No hay listings. Agrégalos desde WhatsApp.</p>
         )}
-
         {sortedCats.map((cat) => (
           <div key={cat}>
-            {/* Category header */}
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-[#C4A45A]" />
               <h2 className="text-[11px] tracking-[0.38em] text-[#C4A45A] uppercase font-medium">
                 {CATEGORY_LABEL[cat] ?? cat}
               </h2>
             </div>
-
-            {/* Agencies within category */}
             <div className="space-y-8">
               {Object.entries(grouped[cat]).sort(([a], [b]) => a.localeCompare(b)).map(([agency, items]) => (
                 <div key={agency}>
-                  {/* Agency subheader */}
                   <div className="flex items-center gap-2 mb-3 pl-1">
                     <span className="text-[9px] tracking-[0.3em] text-[#3A3028] uppercase">Agencia</span>
                     <span className="text-xs text-[#7A7060] font-medium">{agency}</span>
                     <span className="text-[9px] text-[#2A2018] ml-auto">{items.length} listings</span>
                   </div>
-
                   <div className="space-y-3">
                     {items.map((listing) => (
                       <ImageManager key={listing.id} listing={listing} />
