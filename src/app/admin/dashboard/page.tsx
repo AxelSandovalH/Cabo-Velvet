@@ -5,6 +5,18 @@ import ImageManager from './ImageManager'
 type Listing = {
   id: string
   name: string
+  tagline: string | null
+  location: string | null
+  description: string | null
+  price: number | null
+  agency_price: number | null
+  price_unit: string | null
+  price_notes: string | null
+  contact_name: string | null
+  contact_phone: string | null
+  contact_email: string | null
+  whatsapp: string | null
+  active: boolean
   category: string
   images: string[] | null
 }
@@ -17,7 +29,7 @@ export default async function DashboardPage() {
 
   const { data: listings } = await supabase
     .from('listings')
-    .select('id, name, category, images')
+    .select('id, name, tagline, location, description, price, agency_price, price_unit, price_notes, contact_name, contact_phone, contact_email, whatsapp, active, category, images')
     .order('category')
     .order('name')
 
