@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { motion } from "framer-motion";
 
@@ -6,30 +6,23 @@ const WHATSAPP_NUMBER = "526241234567";
 const WHATSAPP_MSG = encodeURIComponent("Hi, I'd like to learn more about Cabo Rico.");
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`;
 
-const footerLinks = {
-  Services: [
-    "Yacht Charters",
-    "Private Villas",
-    "VIP Nightlife",
-    "Ground Transport",
-    "ATV & Adventures",
-    "Bespoke Concierge",
-  ],
-  Company: ["About", "How It Works", "Press", "Instagram", "TikTok"],
-  Contact: ["WhatsApp", "Email", "Instagram DM", "Los Cabos, BCS México"],
-};
+const navLinks = [
+  { label: "Experiences", anchor: "#experiences" },
+  { label: "Villas",       anchor: "#villas" },
+  { label: "Yachts",       anchor: "#yachts" },
+  { label: "Services",     anchor: "#services" },
+];
 
 export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
     <footer className="bg-[#080808] border-t border-white/[0.04]">
-      {/* Main footer */}
-      <div className="max-w-7xl mx-auto px-6 md:px-10 py-20 md:py-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 md:gap-8">
+      <div className="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
           {/* Brand */}
-          <div className="lg:col-span-2">
-            <div className="mb-6">
+          <div className="md:col-span-2">
+            <div className="mb-5">
               <p
                 className="font-display text-2xl tracking-[0.2em] text-[#F2EDE4] uppercase font-light"
                 style={{ fontFamily: "var(--font-cormorant)" }}
@@ -37,69 +30,63 @@ export default function Footer() {
                 Cabo Rico
               </p>
               <p className="text-[9px] tracking-[0.35em] text-[#C4A45A] uppercase mt-1">
-                Los Cabos
+                Los Cabos · BCS · México
               </p>
             </div>
-
-            <p className="text-[#4A4038] text-sm leading-relaxed font-light max-w-xs mb-8">
-              The most exclusive private concierge service in Los Cabos, Baja
-              California Sur. Crafted for travelers who demand the extraordinary.
+            <p className="text-[#4A4038] text-sm leading-relaxed font-light max-w-sm mb-8">
+              Directorio de lujo en Los Cabos. Tours, yates, villas y experiencias curadas — todo gestionado por WhatsApp.
             </p>
-
-            {/* WhatsApp CTA */}
             <a
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 text-[#C4A45A] text-[10px] tracking-[0.2em] uppercase hover:gap-3 transition-all duration-300"
+              className="inline-flex items-center gap-2.5 text-[#C4A45A] text-[10px] tracking-[0.2em] uppercase hover:gap-4 transition-all duration-300"
             >
               <WhatsAppIcon />
-              <span className="hover-line">Message Us</span>
+              <span>Escríbenos</span>
             </a>
           </div>
 
-          {/* Link columns */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h4 className="text-[9px] tracking-[0.3em] text-[#C4A45A] uppercase mb-5">
-                {category}
-              </h4>
-              <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href={category === "Contact" && link === "WhatsApp" ? WHATSAPP_URL : "#"}
-                      target={category === "Contact" && link === "WhatsApp" ? "_blank" : undefined}
-                      rel={category === "Contact" && link === "WhatsApp" ? "noopener noreferrer" : undefined}
-                      className="text-[#4A4038] text-sm font-light hover:text-[#9A9080] transition-colors duration-200"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* Nav */}
+          <div>
+            <h4 className="text-[9px] tracking-[0.3em] text-[#C4A45A] uppercase mb-5">
+              Explorar
+            </h4>
+            <ul className="space-y-3">
+              {navLinks.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.anchor}
+                    className="text-[#4A4038] text-sm font-light hover:text-[#9A9080] transition-colors duration-200"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#4A4038] text-sm font-light hover:text-[#9A9080] transition-colors duration-200"
+                >
+                  WhatsApp
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
       {/* Bottom bar */}
       <div className="border-t border-white/[0.04]">
-        <div className="max-w-7xl mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-[#2A2218] text-[10px] tracking-[0.15em] uppercase">
             © {year} Cabo Rico. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-[#2A2218] text-[10px] tracking-[0.15em] uppercase hover:text-[#4A4038] transition-colors">
-              Privacy
-            </a>
-            <a href="#" className="text-[#2A2218] text-[10px] tracking-[0.15em] uppercase hover:text-[#4A4038] transition-colors">
-              Terms
-            </a>
-            <span className="text-[#2A2218] text-[10px] tracking-[0.15em] uppercase">
-              Los Cabos · BCS · México
-            </span>
-          </div>
+          <span className="text-[#2A2218] text-[10px] tracking-[0.15em] uppercase">
+            caboricotours.com
+          </span>
         </div>
       </div>
     </footer>

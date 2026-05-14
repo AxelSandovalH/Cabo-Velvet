@@ -6,13 +6,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type { DBListing } from "@/lib/listings";
 
-const STATIC = [
-  { id: "solano", href: "/villas/villa-solano", name: "VILLA SOLANO", tagline: "Ultra-Private Oceanfront", location: "El Pedregal · 5 BR", image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=900&q=90&auto=format&fit=crop" },
-  { id: "obsidian", href: "/villas/villa-obsidian", name: "VILLA OBSIDIAN", tagline: "Cliffside Panorama", location: "Pedregal Cliffs · 7 BR", image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=900&q=90&auto=format&fit=crop" },
-  { id: "petra", href: "/villas/casa-petra", name: "CASA PETRA", tagline: "Private Beach Access", location: "Cabo San Lucas · 4 BR", image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=90&auto=format&fit=crop" },
-  { id: "aurora", href: "/villas/villa-aurora", name: "VILLA AURORA", tagline: "Three Pools · Sunset Views", location: "Hillside Reserve · 6 BR", image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=900&q=90&auto=format&fit=crop" },
-];
-
 type Card = { id: string; href: string; name: string; tagline: string; location: string; image: string }
 
 function fromDB(listings: DBListing[]): Card[] {
@@ -26,10 +19,12 @@ function fromDB(listings: DBListing[]): Card[] {
   }))
 }
 
+const WA_VILLAS = `https://wa.me/526241234567?text=${encodeURIComponent("Hi, I'd like to see available villas in Los Cabos.")}`
+
 export default function VillasSection({ listings }: { listings?: DBListing[] }) {
   const headerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(headerRef, { once: true, margin: "-80px" });
-  const cards = listings?.length ? fromDB(listings) : STATIC;
+  const cards = listings?.length ? fromDB(listings) : [];
 
   return (
     <section id="villas" className="pt-24 md:pt-32 pb-0 bg-[#060606]">
@@ -61,33 +56,38 @@ export default function VillasSection({ listings }: { listings?: DBListing[] }) 
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.25 }}
-          href="https://wa.me/526241234567?text=Hi%2C%20I'd%20like%20to%20see%20all%20available%20villas%20in%20Los%20Cabos."
+          href={WA_VILLAS}
           target="_blank"
           rel="noopener noreferrer"
-          className="self-start text-[9px] tracking-[0.28em] text-[#3A3028] uppercase hover:text-[#C4A45A] transition-colors duration-300 hover-line pb-0.5"
+          className="self-start text-[9px] tracking-[0.28em] text-[#3A3028] uppercase hover:text-[#C4A45A] transition-colors duration-300 pb-0.5"
         >
-          All properties →
+          Consultar disponibilidad →
         </motion.a>
       </div>
 
-      <div className="relative">
-        <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 bg-gradient-to-l from-[#060606] to-transparent pointer-events-none" />
-        <div
-          className="flex gap-3 md:gap-4 overflow-x-auto pb-10 md:pb-12 px-6 md:px-14 lg:px-20"
-          style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
-        >
-          {cards.map((c, i) => (
-            <VillaCard key={c.id} card={c} index={i} />
-          ))}
-          <div className="flex-shrink-0 w-2 md:w-8" />
-        </div>
-      </div>
-
-      <div className="flex items-center justify-center gap-3 pb-8 md:hidden">
-        <div className="w-10 h-px bg-[#C4A45A]/30" />
-        <span className="text-[8px] tracking-[0.35em] text-[#2A2018] uppercase">Swipe</span>
-        <div className="w-10 h-px bg-[#C4A45A]/30" />
-      </div>
+      {cards.length > 0 ? (
+        <>
+          <div className="relative">
+            <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 bg-gradient-to-l from-[#060606] to-transparent pointer-events-none" />
+            <div
+              className="flex gap-3 md:gap-4 overflow-x-auto pb-10 md:pb-12 px-6 md:px-14 lg:px-20"
+              style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
+            >
+              {cards.map((c, i) => (
+                <VillaCard key={c.id} card={c} index={i} />
+              ))}
+              <div className="flex-shrink-0 w-2 md:w-8" />
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-3 pb-8 md:hidden">
+            <div className="w-10 h-px bg-[#C4A45A]/30" />
+            <span className="text-[8px] tracking-[0.35em] text-[#2A2018] uppercase">Swipe</span>
+            <div className="w-10 h-px bg-[#C4A45A]/30" />
+          </div>
+        </>
+      ) : (
+        <ComingSoon waUrl={WA_VILLAS} label="villas" />
+      )}
     </section>
   );
 }
@@ -126,9 +126,29 @@ function VillaCard({ card, index }: { card: Card; index: number }) {
             </p>
             <p className="text-[#7A7060] text-[10px] tracking-[0.2em] uppercase font-light">{card.tagline}</p>
           </div>
-          <div className="absolute inset-0 bg-[#C4A45A]/0 group-hover:bg-[#C4A45A]/5 transition-colors duration-500" />
         </div>
       </Link>
     </motion.div>
+  );
+}
+
+function ComingSoon({ waUrl, label }: { waUrl: string; label: string }) {
+  return (
+    <div className="px-6 md:px-14 lg:px-20 pb-20 md:pb-28">
+      <div className="border border-white/[0.06] py-16 flex flex-col items-center gap-5 text-center">
+        <span className="text-[9px] tracking-[0.35em] text-[#3A3028] uppercase">Próximamente</span>
+        <p className="font-display font-light text-[#4A4038] text-2xl" style={{ fontFamily: "var(--font-cormorant)" }}>
+          Catálogo de {label} en camino
+        </p>
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex items-center gap-2 px-7 py-3 border border-[#C4A45A]/30 text-[#C4A45A] text-[10px] tracking-[0.22em] uppercase hover:bg-[#C4A45A] hover:text-[#080808] transition-all duration-300"
+        >
+          Consultar por WhatsApp →
+        </a>
+      </div>
+    </div>
   );
 }

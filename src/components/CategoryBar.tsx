@@ -1,20 +1,17 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 
 const categories = [
-  { id: "villas", label: "Villas", anchor: "#villas" },
-  { id: "yachts", label: "Yachts", anchor: "#yachts" },
-  { id: "nightlife", label: "Nightlife", anchor: "#nightlife" },
   { id: "experiences", label: "Experiences", anchor: "#experiences" },
-  { id: "transport", label: "Transport", anchor: "#services" },
-  { id: "concierge", label: "Concierge", anchor: "#services" },
+  { id: "villas",      label: "Villas",       anchor: "#villas" },
+  { id: "yachts",      label: "Yachts",       anchor: "#yachts" },
+  { id: "services",    label: "Services",     anchor: "#services" },
 ];
 
 export default function CategoryBar() {
-  const [active, setActive] = useState("villas");
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState("experiences");
 
   return (
     <div
@@ -22,10 +19,8 @@ export default function CategoryBar() {
       className="sticky top-16 md:top-20 z-40 bg-[#080808]/95 backdrop-blur-xl border-b border-white/[0.05]"
     >
       <div className="max-w-7xl mx-auto">
-        {/* Scrollable category row */}
         <div
-          ref={scrollRef}
-          className="flex items-center gap-0 overflow-x-auto scrollbar-none px-6 md:px-12"
+          className="flex items-center gap-0 overflow-x-auto px-6 md:px-12"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {categories.map((cat) => (
@@ -44,7 +39,6 @@ export default function CategoryBar() {
               >
                 {cat.label}
               </div>
-              {/* Active indicator line */}
               {active === cat.id && (
                 <motion.div
                   layoutId="category-indicator"

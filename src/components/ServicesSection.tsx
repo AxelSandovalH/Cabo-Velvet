@@ -6,13 +6,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type { DBListing } from "@/lib/listings";
 
-const STATIC = [
-  { id: "nightlife", href: "/services/nightlife", label: "VIP ACCESS", title: "Nightlife", image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&q=85&auto=format&fit=crop", size: "large" as const },
-  { id: "transport", href: "/services/transport", label: "24 / 7 FLEET", title: "Transport", image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=85&auto=format&fit=crop", size: "small" as const },
-  { id: "atv", href: "/services/adventures", label: "BAJA DESERT", title: "Adventures", image: "https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=800&q=85&auto=format&fit=crop", size: "small" as const },
-  { id: "concierge", href: "/services/concierge", label: "FULLY BESPOKE", title: "Concierge", image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=85&auto=format&fit=crop", size: "large" as const },
-];
-
 type Card = { id: string; href: string; label: string; title: string; image: string; size: 'large' | 'small' }
 
 const SIZES: ('large' | 'small')[] = ['large', 'small', 'small', 'large']
@@ -28,10 +21,12 @@ function fromDB(listings: DBListing[]): Card[] {
   }))
 }
 
+const WA_SERVICES = `https://wa.me/526241234567?text=${encodeURIComponent("Hi, I'd like to plan my full Cabo Rico experience.")}`
+
 export default function ServicesSection({ listings }: { listings?: DBListing[] }) {
   const headerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(headerRef, { once: true, margin: "-80px" });
-  const cards = listings?.length ? fromDB(listings) : STATIC;
+  const cards = listings?.length ? fromDB(listings) : [];
 
   const large = cards.filter((s) => s.size === "large");
   const small = cards.filter((s) => s.size === "small");
@@ -65,25 +60,42 @@ export default function ServicesSection({ listings }: { listings?: DBListing[] }
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.25 }}
-            href="https://wa.me/526241234567?text=Hi%2C%20I'd%20like%20to%20plan%20my%20full%20Cabo%20Velvet%20experience."
+            href={WA_SERVICES}
             target="_blank"
             rel="noopener noreferrer"
-            className="self-start text-[9px] tracking-[0.28em] text-[#3A3028] uppercase hover:text-[#C4A45A] transition-colors duration-300 hover-line pb-0.5"
+            className="self-start text-[9px] tracking-[0.28em] text-[#3A3028] uppercase hover:text-[#C4A45A] transition-colors duration-300 pb-0.5"
           >
             Plan everything →
           </motion.a>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
-          {large[0] && <ServiceCard card={large[0]} index={0} className="md:col-span-7" tall />}
-          {(small[0] || small[1]) && (
-            <div className="md:col-span-5 grid grid-rows-2 gap-3 md:gap-4">
-              {small[0] && <ServiceCard card={small[0]} index={1} />}
-              {small[1] && <ServiceCard card={small[1]} index={2} />}
-            </div>
-          )}
-          {large[1] && <ServiceCard card={large[1]} index={3} className="md:col-span-7 md:col-start-6" tall />}
-        </div>
+        {cards.length >= 4 ? (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
+            {large[0] && <ServiceCard card={large[0]} index={0} className="md:col-span-7" tall />}
+            {(small[0] || small[1]) && (
+              <div className="md:col-span-5 grid grid-rows-2 gap-3 md:gap-4">
+                {small[0] && <ServiceCard card={small[0]} index={1} />}
+                {small[1] && <ServiceCard card={small[1]} index={2} />}
+              </div>
+            )}
+            {large[1] && <ServiceCard card={large[1]} index={3} className="md:col-span-7 md:col-start-6" tall />}
+          </div>
+        ) : (
+          <div className="border border-white/[0.06] py-16 flex flex-col items-center gap-5 text-center">
+            <span className="text-[9px] tracking-[0.35em] text-[#3A3028] uppercase">Próximamente</span>
+            <p className="font-display font-light text-[#4A4038] text-2xl" style={{ fontFamily: "var(--font-cormorant)" }}>
+              Servicios adicionales en camino
+            </p>
+            <a
+              href={WA_SERVICES}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-2 px-7 py-3 border border-[#C4A45A]/30 text-[#C4A45A] text-[10px] tracking-[0.22em] uppercase hover:bg-[#C4A45A] hover:text-[#080808] transition-all duration-300"
+            >
+              Consultar por WhatsApp →
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -111,7 +123,6 @@ function ServiceCard({ card, index, className = "", tall = false }: { card: Card
             {card.title}
           </h3>
         </div>
-        <div className="absolute inset-0 bg-[#C4A45A]/0 group-hover:bg-[#C4A45A]/6 transition-colors duration-500" />
       </Link>
     </motion.div>
   );
