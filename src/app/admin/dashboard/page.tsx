@@ -7,8 +7,10 @@ type Listing = {
   name: string
   category: string
   images: string[] | null
-  provider: { id: string; name: string } | null
+  provider_id: string | null
 }
+
+type Provider = { id: string; name: string }
 
 const CATEGORY_LABEL: Record<string, string> = {
   villa: 'Villas',
@@ -20,32 +22,29 @@ const CATEGORY_LABEL: Record<string, string> = {
 const CATEGORY_ORDER = ['experience', 'villa', 'yacht', 'service']
 
 export default async function DashboardPage() {
-  // Auth check with anon key client
   const authClient = await createSupabaseServer()
   const { data: { user } } = await authClient.auth.getUser()
   if (!user) redirect('/admin/login')
 
-  // DB query with service role client
   const db = await createSupabaseAdmin()
-  const { data: listings } = await db
-    .from('listings')
-    .select('id, name, category, images, providers(id, name)')
-    .order('category')
-    .order('name')
 
-  const rows: Listing[] = (listings ?? []).map((l: Record<string, unknown>) => ({
-    id: l.id as string,
-    name: l.name as string,
-    category: l.category as string,
-    images: l.images as string[] | null,
-    provider: l.providers as { id: string; name: string } | null,
-  }))
+  // Two separate queries — avoids PostgREST join issues
+  const [{ data: listings, error: listingsError }, { data: providers }] = await Promise.all([
+    db.from('listings').select('id, name, category, images, provider_id').order('category').order('name'),
+    db.from('providers').select('id, name'),
+  ])
+
+  if (listingsError) {
+    console.error('[dashboard] listings error:', listingsError.message)
+  }
+
+  const providerMap = Object.fromEntries((providers ?? []).map((p: Provider) => [p.id, p.name]))
 
   // Group: category → agency → listings
   const grouped: Record<string, Record<string, Listing[]>> = {}
-  for (const listing of rows) {
+  for (const listing of (listings ?? []) as Listing[]) {
     const cat = listing.category ?? 'other'
-    const agency = listing.provider?.name ?? 'Sin agencia'
+    const agency = listing.provider_id ? (providerMap[listing.provider_id] ?? 'Sin agencia') : 'Sin agencia'
     if (!grouped[cat]) grouped[cat] = {}
     if (!grouped[cat][agency]) grouped[cat][agency] = []
     grouped[cat][agency].push(listing)
@@ -66,8 +65,11 @@ export default async function DashboardPage() {
 
       <main className="px-4 sm:px-8 py-6 max-w-5xl mx-auto space-y-14">
         {sortedCats.length === 0 && (
-          <p className="text-white/40">No hay listings. Agrégalos desde WhatsApp.</p>
+          <p className="text-white/40 text-sm">
+            {listingsError ? `Error: ${listingsError.message}` : 'No hay listings aún.'}
+          </p>
         )}
+
         {sortedCats.map((cat) => (
           <div key={cat}>
             <div className="flex items-center gap-3 mb-6">
