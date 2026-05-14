@@ -27,11 +27,19 @@ export async function middleware(request: NextRequest) {
   const isLoginPage = request.nextUrl.pathname === '/admin/login'
 
   if (isAdminRoute && !isLoginPage && !user) {
-    return NextResponse.redirect(new URL('/admin/login', request.url))
+    const redirectResponse = NextResponse.redirect(new URL('/admin/login', request.url))
+    supabaseResponse.cookies.getAll().forEach((cookie) =>
+      redirectResponse.cookies.set(cookie.name, cookie.value, cookie)
+    )
+    return redirectResponse
   }
 
   if (isLoginPage && user) {
-    return NextResponse.redirect(new URL('/admin/dashboard', request.url))
+    const redirectResponse = NextResponse.redirect(new URL('/admin/dashboard', request.url))
+    supabaseResponse.cookies.getAll().forEach((cookie) =>
+      redirectResponse.cookies.set(cookie.name, cookie.value, cookie)
+    )
+    return redirectResponse
   }
 
   return supabaseResponse
