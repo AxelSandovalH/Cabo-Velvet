@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
-import { supabase } from '@/lib/supabase'
 import Stripe from 'stripe'
 
 export async function POST(req: NextRequest) {
@@ -27,23 +26,6 @@ export async function POST(req: NextRequest) {
     const amountPaid = session.amount_total ? session.amount_total / 100 : null
 
     console.log('[payment confirmed]', { listingId, customerEmail, amountPaid })
-
-    // Log the sale to Supabase
-    if (listingId) {
-      await supabase.from('conversations').upsert(
-        {
-          phone: `stripe:${session.id}`,
-          messages: [
-            {
-              role: 'assistant',
-              content: `Pago confirmado: $${amountPaid} USD — listing ${listingId} — cliente ${customerEmail ?? 'unknown'}`,
-            },
-          ],
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'phone' }
-      )
-    }
   }
 
   return NextResponse.json({ received: true })
