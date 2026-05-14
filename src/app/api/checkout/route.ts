@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
             unit_amount: Math.round(listing.price * 100),
             product_data: {
               name: listing.name,
-              description: listing.tagline ?? undefined,
+              ...(listing.tagline ? { description: listing.tagline } : {}),
             },
           },
         },
