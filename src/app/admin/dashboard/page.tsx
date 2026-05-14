@@ -7,7 +7,10 @@ type Listing = {
   name: string
   category: string
   images: string[] | null
+  provider_id: string | null
 }
+
+type Provider = { id: string; name: string }
 
 const CATEGORY_LABEL: Record<string, string> = {
   villa: 'Villas',
@@ -24,20 +27,26 @@ export default async function DashboardPage() {
   if (!user) redirect('/admin/login')
 
   const db = await createSupabaseAdmin()
-  const { data: listings, error } = await db
-    .from('listings')
-    .select('id, name, category, images')
-    .order('category')
-    .order('name')
+
+  const [{ data: listings, error }, { data: providers }] = await Promise.all([
+    db.from('listings').select('id, name, category, images, provider_id').order('category').order('name'),
+    db.from('providers').select('id, name'),
+  ])
 
   if (error) console.error('[dashboard]', error.message)
 
-  // Group by category
-  const grouped: Record<string, Listing[]> = {}
+  const providerMap = Object.fromEntries(
+    (providers ?? []).map((p: Provider) => [p.id, p.name])
+  )
+
+  // Group: category → agency → listings
+  const grouped: Record<string, Record<string, Listing[]>> = {}
   for (const l of (listings ?? []) as Listing[]) {
     const cat = l.category ?? 'other'
-    if (!grouped[cat]) grouped[cat] = []
-    grouped[cat].push(l)
+    const agency = l.provider_id ? (providerMap[l.provider_id] ?? 'Sin agencia') : 'Sin agencia'
+    if (!grouped[cat]) grouped[cat] = {}
+    if (!grouped[cat][agency]) grouped[cat][agency] = []
+    grouped[cat][agency].push(l)
   }
 
   const sortedCats = Object.keys(grouped).sort(
@@ -53,7 +62,7 @@ export default async function DashboardPage() {
         </form>
       </header>
 
-      <main className="px-4 sm:px-8 py-6 max-w-5xl mx-auto space-y-12">
+      <main className="px-4 sm:px-8 py-6 max-w-5xl mx-auto space-y-14">
         {sortedCats.length === 0 && (
           <p className="text-white/40 text-sm">
             {error ? `Error: ${error.message}` : 'No hay listings aún.'}
@@ -62,17 +71,30 @@ export default async function DashboardPage() {
 
         {sortedCats.map((cat) => (
           <div key={cat}>
-            <div className="flex items-center gap-3 mb-5">
+            <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-px bg-[#C4A45A]" />
               <h2 className="text-[11px] tracking-[0.38em] text-[#C4A45A] uppercase font-medium">
                 {CATEGORY_LABEL[cat] ?? cat}
               </h2>
-              <span className="text-[9px] text-[#2A2018] ml-auto">{grouped[cat].length} listings</span>
             </div>
-            <div className="space-y-3">
-              {grouped[cat].map((listing) => (
-                <ImageManager key={listing.id} listing={listing} />
-              ))}
+
+            <div className="space-y-10">
+              {Object.entries(grouped[cat])
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([agency, items]) => (
+                  <div key={agency}>
+                    <div className="flex items-center gap-2 mb-3 pl-1">
+                      <span className="text-[9px] tracking-[0.3em] text-[#3A3028] uppercase">Agencia</span>
+                      <span className="text-xs text-[#7A7060] font-medium">{agency}</span>
+                      <span className="text-[9px] text-[#2A2018] ml-auto">{items.length} listings</span>
+                    </div>
+                    <div className="space-y-3">
+                      {items.map((listing) => (
+                        <ImageManager key={listing.id} listing={listing} />
+                      ))}
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
         ))}
