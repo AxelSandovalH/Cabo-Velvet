@@ -17,15 +17,14 @@ export default function HeroSection() {
   });
 
   const imgScale = useTransform(scrollYProgress, [0, 1], [1.06, 1.14]);
-  const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
 
   return (
     <section ref={ref} className="relative h-[100svh] min-h-[700px] overflow-hidden">
       {/* Image — slight Ken Burns scale on scroll */}
       <motion.div className="absolute inset-0 z-0" style={{ scale: imgScale }}>
         <Image
-          src="https://images.unsplash.com/photo-1602002418816-5c0aeef426aa?w=1920&q=92&auto=format&fit=crop"
+          src="/hero.jpg"
           alt="Los Cabos"
           fill
           priority
@@ -53,7 +52,7 @@ export default function HeroSection() {
 
       {/* Content */}
       <motion.div
-        style={{ y: contentY, opacity }}
+        style={{ opacity }}
         className="relative z-10 h-full flex flex-col justify-between px-6 md:px-14 lg:px-20 pt-8 pb-10 md:pb-14"
       >
         {/* Logo — top left, stacked, large */}
