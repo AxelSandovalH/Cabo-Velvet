@@ -24,28 +24,27 @@ export default function ImageManager({ listing }: { listing: Listing }) {
     setUploading(true)
     setError('')
 
-    const supabase = createSupabaseBrowser()
     const newUrls: string[] = []
 
     for (const file of files) {
-      const ext = file.name.split('.').pop()
-      const path = `${listing.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      const form = new FormData()
+      form.append('file', file)
+      form.append('listingId', listing.id)
 
-      const { error: uploadError } = await supabase.storage
-        .from('listings')
-        .upload(path, file, { upsert: false })
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: form })
+      const json = await res.json()
 
-      if (uploadError) {
-        setError(`Error subiendo ${file.name}`)
+      if (!res.ok || json.error) {
+        setError(`Error subiendo ${file.name}: ${json.error ?? res.statusText}`)
         continue
       }
 
-      const { data } = supabase.storage.from('listings').getPublicUrl(path)
-      newUrls.push(data.publicUrl)
+      newUrls.push(json.url)
     }
 
     if (newUrls.length) {
       const updated = [...images, ...newUrls]
+      const supabase = createSupabaseBrowser()
       const { error: dbError } = await supabase
         .from('listings')
         .update({ images: updated, updated_at: new Date().toISOString() })
@@ -63,15 +62,18 @@ export default function ImageManager({ listing }: { listing: Listing }) {
   }
 
   async function handleDelete(url: string) {
-    const supabase = createSupabaseBrowser()
+    // Extract storage path from public URL
+    const marker = '/object/public/listings/'
+    const idx = url.indexOf(marker)
+    const path = idx !== -1 ? url.slice(idx + marker.length) : null
 
-    const parts = url.split('/listings/')
-    const path = parts[1]
     if (path) {
+      const supabase = createSupabaseBrowser()
       await supabase.storage.from('listings').remove([path])
     }
 
     const updated = images.filter((img) => img !== url)
+    const supabase = createSupabaseBrowser()
     const { error: dbError } = await supabase
       .from('listings')
       .update({ images: updated, updated_at: new Date().toISOString() })
@@ -82,7 +84,7 @@ export default function ImageManager({ listing }: { listing: Listing }) {
 
   return (
     <div className="bg-white/5 rounded-xl border border-white/10 p-4 sm:p-5">
-      {/* Header — wraps on small screens */}
+      {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
         <h2 className="text-sm font-semibold leading-snug flex-1 min-w-0 pr-2">
           {listing.name}
@@ -92,19 +94,8 @@ export default function ImageManager({ listing }: { listing: Listing }) {
           disabled={uploading}
           className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 bg-[#C4A45A] text-[#080808] rounded-lg text-xs font-semibold active:opacity-80 disabled:opacity-50 transition-opacity"
         >
-          {uploading ? (
-            <>
-              <Spinner />
-              Subiendo…
-            </>
-          ) : (
-            <>
-              <PlusIcon />
-              Fotos
-            </>
-          )}
+          {uploading ? <><Spinner />Subiendo…</> : <><PlusIcon />Fotos</>}
         </button>
-        {/* input — accept image/*, no capture so user can choose camera or library */}
         <input
           ref={inputRef}
           type="file"
@@ -139,7 +130,7 @@ export default function ImageManager({ listing }: { listing: Listing }) {
                 className="object-cover"
                 sizes="(max-width: 640px) 50vw, 33vw"
               />
-              {/* Delete — always visible on mobile (bottom strip), hover overlay on desktop */}
+              {/* Always visible on mobile, hover on desktop */}
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent pt-4 pb-1.5 px-2 flex justify-end sm:opacity-0 sm:hover:opacity-100 sm:bg-black/60 sm:inset-0 sm:items-center sm:justify-center sm:pb-0 sm:pt-0 sm:transition-opacity">
                 <button
                   onClick={() => handleDelete(url)}
@@ -182,7 +173,7 @@ function UploadIcon() {
 
 function Spinner() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="animate-spin">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="animate-spin mr-1">
       <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
     </svg>
   )
