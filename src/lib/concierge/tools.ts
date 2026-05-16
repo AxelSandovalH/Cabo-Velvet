@@ -161,23 +161,14 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
           return JSON.stringify({ error: 'Stripe did not return a URL — tell user to contact via WhatsApp' })
         }
 
-        const shortId = Array.from(crypto.getRandomValues(new Uint8Array(4)))
-          .map((b) => b.toString(36).padStart(2, '0'))
-          .join('')
-          .slice(0, 6)
-
         await supabase.from('bookings').insert({
           listing_id: listing.id,
           stripe_session_id: session.id,
           stripe_url: session.url,
-          short_id: shortId,
           status: 'link_sent',
         })
 
-        const siteBase = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://cabo-velvet.vercel.app').replace(/\/$/, '')
-        const shortUrl = `${siteBase}/pay/${shortId}`
-
-        return JSON.stringify({ payment_url: shortUrl, listing_name: listing.name, price: listing.price })
+        return JSON.stringify({ payment_url: session.url, listing_name: listing.name, price: listing.price })
       }
 
       case 'save_lead_info': {
