@@ -3,16 +3,17 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n/translations";
 
 const WHATSAPP_NUMBER = "526241234567";
-const WHATSAPP_MSG = encodeURIComponent(
-  "Hi, I'd like to plan a luxury trip to Los Cabos. Can you help?"
-);
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`;
 
 export default function CTASection() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { lang } = useLanguage();
+  const tx = t[lang];
+  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tx.cta.waMessage)}`;
 
   return (
     <section className="relative py-0 overflow-hidden">
@@ -39,7 +40,7 @@ export default function CTASection() {
           >
             <div className="w-5 h-px bg-[#C4A45A]" />
             <span className="text-[10px] tracking-[0.35em] text-[#C4A45A] uppercase">
-              Start Planning
+              {tx.cta.label}
             </span>
             <div className="w-5 h-px bg-[#C4A45A]" />
           </motion.div>
@@ -51,8 +52,8 @@ export default function CTASection() {
             className="font-display text-[clamp(2.8rem,7vw,5rem)] font-light leading-tight text-[#F2EDE4] mb-4"
             style={{ fontFamily: "var(--font-cormorant)" }}
           >
-            Your perfect Cabo trip{" "}
-            <span className="italic text-[#C4A45A]">begins here.</span>
+            {tx.cta.heading}{" "}
+            <span className="italic text-[#C4A45A]">{tx.cta.heading_italic}</span>
           </motion.h2>
 
           <motion.p
@@ -61,9 +62,9 @@ export default function CTASection() {
             transition={{ duration: 0.7, delay: 0.25 }}
             className="text-[#A09080] text-sm md:text-base leading-relaxed mb-10 font-light"
           >
-            Tell us your dates, your group, and your vision.
-            <br />
-            We handle everything else — instantly, via WhatsApp.
+            {tx.cta.body.split('\n').map((line, i) => (
+              <span key={i}>{line}{i === 0 && <br />}</span>
+            ))}
           </motion.p>
 
           <motion.div
@@ -73,13 +74,13 @@ export default function CTASection() {
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             <a
-              href={WHATSAPP_URL}
+              href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center justify-center gap-3 px-10 py-4 bg-[#C4A45A] text-[#080808] text-[11px] tracking-[0.25em] uppercase font-semibold hover:bg-[#D4B468] transition-all duration-300"
             >
               <WhatsAppIcon />
-              Message Us on WhatsApp
+              {tx.cta.cta}
             </a>
           </motion.div>
 
@@ -90,11 +91,11 @@ export default function CTASection() {
             transition={{ duration: 0.6, delay: 0.6 }}
             className="mt-10 flex items-center justify-center gap-6 text-[9px] tracking-[0.2em] text-[#6A6050] uppercase"
           >
-            <span>No booking fees</span>
+            <span>{tx.cta.trust1}</span>
             <span className="text-[#C4A45A]">·</span>
-            <span>Instant response</span>
+            <span>{tx.cta.trust2}</span>
             <span className="text-[#C4A45A]">·</span>
-            <span>100% private</span>
+            <span>{tx.cta.trust3}</span>
           </motion.div>
         </div>
       </div>

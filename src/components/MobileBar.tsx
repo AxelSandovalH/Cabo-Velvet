@@ -2,15 +2,17 @@
 
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n/translations";
 
 const WHATSAPP_NUMBER = "526241234567";
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Hi, I'd like to plan a luxury experience in Los Cabos."
-)}`;
 
 export default function MobileBar() {
   const [visible, setVisible] = useState(false);
   const { scrollY } = useScroll();
+  const { lang } = useLanguage();
+  const tx = t[lang];
+  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tx.mobile.waMessage)}`;
 
   useMotionValueEvent(scrollY, "change", (v) => {
     setVisible(v > 300);
@@ -26,7 +28,7 @@ export default function MobileBar() {
         className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
       >
         <a
-          href={WHATSAPP_URL}
+          href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-3 w-full py-4 bg-[#C4A45A] text-[#060606]"
@@ -34,7 +36,7 @@ export default function MobileBar() {
         >
           <WhatsAppIcon />
           <span className="text-[11px] tracking-[0.28em] uppercase font-semibold">
-            WhatsApp Concierge
+            {tx.mobile.wa_cta}
           </span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M5 12h14M12 5l7 7-7 7" />
@@ -51,7 +53,7 @@ export default function MobileBar() {
         style={{ pointerEvents: visible ? "auto" : "none" }}
       >
         <a
-          href={WHATSAPP_URL}
+          href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center gap-2.5 px-5 py-3 bg-[#C4A45A] text-[#060606] shadow-[0_8px_32px_rgba(196,164,90,0.28)] hover:bg-[#D4B468] hover:shadow-[0_8px_40px_rgba(196,164,90,0.42)] transition-all duration-300"

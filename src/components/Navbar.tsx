@@ -1,17 +1,19 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n/translations";
 
 const WHATSAPP_NUMBER = "526241234567";
-const WHATSAPP_MSG = encodeURIComponent(
-  "Hi, I'd like to book a luxury experience in Los Cabos."
-);
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`;
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { lang, toggle } = useLanguage();
+  const tx = t[lang];
+
+  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tx.nav.waMessage)}`;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -19,11 +21,19 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Lock body scroll when menu open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
+
+  const navItems = [
+    { label: tx.nav.villas,       sub: tx.nav.villas_sub,       anchor: "#villas" },
+    { label: tx.nav.yachts,       sub: tx.nav.yachts_sub,       anchor: "#yachts" },
+    { label: tx.nav.experiences,  sub: tx.nav.experiences_sub,  anchor: "#experiences" },
+    { label: tx.nav.nightlife,    sub: tx.nav.nightlife_sub,    anchor: "#services" },
+    { label: tx.nav.transport,    sub: tx.nav.transport_sub,    anchor: "#services" },
+    { label: tx.nav.concierge,    sub: tx.nav.concierge_sub,    anchor: "#services" },
+  ];
 
   return (
     <>
@@ -48,21 +58,33 @@ export default function Navbar() {
             <span className="block w-3.5 h-px bg-[#F2EDE4]/50 group-hover:bg-[#C4A45A] transition-colors duration-300" />
           </button>
 
-          {/* Book CTA — right */}
-          <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-0 border border-[#F2EDE4]/25 hover:border-[#C4A45A]/60 transition-colors duration-300 group"
-          >
-            <span className="px-5 py-2.5 text-[10px] tracking-[0.28em] text-[#F2EDE4]/80 group-hover:text-[#C4A45A] uppercase transition-colors duration-300">
-              Book
-            </span>
-          </a>
+          {/* Right controls */}
+          <div className="flex items-center gap-3">
+            {/* Language toggle */}
+            <button
+              onClick={toggle}
+              className="text-[10px] tracking-[0.22em] text-[#8A8070] hover:text-[#C4A45A] transition-colors duration-300 uppercase px-2 py-1 border border-transparent hover:border-[#C4A45A]/30"
+              aria-label="Toggle language"
+            >
+              {lang === "en" ? "ES" : "EN"}
+            </button>
+
+            {/* Book CTA */}
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-0 border border-[#F2EDE4]/25 hover:border-[#C4A45A]/60 transition-colors duration-300 group"
+            >
+              <span className="px-5 py-2.5 text-[10px] tracking-[0.28em] text-[#F2EDE4]/80 group-hover:text-[#C4A45A] uppercase transition-colors duration-300">
+                {tx.nav.book}
+              </span>
+            </a>
+          </div>
         </div>
       </motion.nav>
 
-      {/* Full-screen mobile menu — editorial dark */}
+      {/* Full-screen mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -99,27 +121,29 @@ export default function Navbar() {
                     Los Cabos
                   </p>
                 </div>
-                <button
-                  onClick={() => setMobileOpen(false)}
-                  className="p-2 text-[#8A8070] hover:text-[#F2EDE4] transition-colors"
-                  aria-label="Close"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
-                </button>
+                <div className="flex items-center gap-3">
+                  {/* Language toggle in drawer */}
+                  <button
+                    onClick={toggle}
+                    className="text-[10px] tracking-[0.22em] text-[#8A8070] hover:text-[#C4A45A] transition-colors uppercase border border-white/[0.08] hover:border-[#C4A45A]/30 px-2.5 py-1.5"
+                  >
+                    {lang === "en" ? "ES" : "EN"}
+                  </button>
+                  <button
+                    onClick={() => setMobileOpen(false)}
+                    className="p-2 text-[#8A8070] hover:text-[#F2EDE4] transition-colors"
+                    aria-label="Close"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
 
               {/* Nav links */}
               <nav className="flex-1 flex flex-col justify-center px-6 gap-1">
-                {[
-                  { label: "Villas", sub: "Private Residences", anchor: "#villas" },
-                  { label: "Yachts", sub: "Fleet & Charters", anchor: "#yachts" },
-                  { label: "Experiences", sub: "Curated Moments", anchor: "#experiences" },
-                  { label: "Nightlife", sub: "VIP Access", anchor: "#services" },
-                  { label: "Transport", sub: "Ground Fleet", anchor: "#services" },
-                  { label: "Concierge", sub: "Whatever You Need", anchor: "#services" },
-                ].map((item, i) => (
+                {navItems.map((item, i) => (
                   <motion.a
                     key={item.label}
                     href={item.anchor}
@@ -150,7 +174,7 @@ export default function Navbar() {
               {/* Bottom CTA */}
               <div className="px-6 py-8 border-t border-white/[0.05]">
                 <motion.a
-                  href={WHATSAPP_URL}
+                  href={waUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   initial={{ opacity: 0 }}
@@ -159,7 +183,7 @@ export default function Navbar() {
                   className="flex items-center justify-center gap-2.5 py-4 bg-[#C4A45A] text-[#080808] text-[10px] tracking-[0.28em] uppercase font-semibold hover:bg-[#D4B468] transition-colors"
                 >
                   <WhatsAppIcon />
-                  Book Your Experience
+                  {tx.mobile.wa_cta}
                 </motion.a>
                 <p className="text-[9px] tracking-[0.2em] text-[#5A5040] uppercase text-center mt-4">
                   Los Cabos · BCS · México

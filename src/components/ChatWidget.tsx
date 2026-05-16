@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@/lib/i18n/translations'
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
@@ -15,19 +17,26 @@ function getSessionId(): string {
   return id
 }
 
-const GREETING: Message = {
+const GREETING_EN: Message = {
   role: 'assistant',
-  content: '¡Hola! Soy el concierge de Cabo Rico 🌊\n\n¿En qué puedo ayudarte hoy? Cuéntame qué tipo de experiencia estás buscando en Los Cabos.',
+  content: 'Hello! I\'m the Cabo Rico concierge.\n\nHow can I help you today? Tell me what kind of experience you\'re looking for in Los Cabos.',
+}
+
+const GREETING_ES: Message = {
+  role: 'assistant',
+  content: '¡Hola! Soy el concierge de Cabo Rico.\n\n¿En qué puedo ayudarte hoy? Cuéntame qué tipo de experiencia estás buscando en Los Cabos.',
 }
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([GREETING])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [sessionId, setSessionId] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const { lang } = useLanguage()
+  const tx = t[lang]
+  const [messages, setMessages] = useState<Message[]>([lang === 'es' ? GREETING_ES : GREETING_EN])
 
   useEffect(() => {
     setSessionId(getSessionId())
@@ -101,8 +110,8 @@ export default function ChatWidget() {
                     <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#080808]" />
                   </div>
                   <div>
-                    <p className="text-[13px] font-medium text-[#F2EDE4]">Cabo Rico Concierge</p>
-                    <p className="text-[10px] text-emerald-400/80">En línea · Responde al instante</p>
+                    <p className="text-[13px] font-medium text-[#F2EDE4]">{tx.chat.title}</p>
+                    <p className="text-[10px] text-emerald-400/80">{tx.chat.subtitle}</p>
                   </div>
                 </div>
                 <button
@@ -165,7 +174,7 @@ export default function ChatWidget() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKey}
-                    placeholder="Escribe tu mensaje…"
+                    placeholder={tx.chat.placeholder}
                     rows={1}
                     disabled={loading}
                     className="flex-1 bg-transparent text-[13px] text-[#F2EDE4] placeholder-white/20 outline-none resize-none max-h-24 leading-relaxed disabled:opacity-50"

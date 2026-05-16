@@ -3,14 +3,17 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n/translations";
 
 const WHATSAPP_NUMBER = "526241234567";
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Hi, I'd like to book a luxury experience in Los Cabos."
-)}`;
 
 export default function HeroSection() {
   const ref = useRef<HTMLDivElement>(null);
+  const { lang } = useLanguage();
+  const tx = t[lang];
+  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tx.hero.waMessage)}`;
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -97,10 +100,10 @@ export default function HeroSection() {
                 fontSize: "clamp(1.9rem, 5.5vw, 3.8rem)",
               }}
             >
-              Your Private Peninsula.
+              {tx.hero.tagline}
             </p>
             <p className="mt-4 text-[#A0907A] text-[11px] tracking-[0.18em] uppercase font-light">
-              Yachts · Villas · Nightlife · Concierge
+              {tx.hero.subtitle}
             </p>
           </motion.div>
 
@@ -112,7 +115,7 @@ export default function HeroSection() {
             className="flex flex-col items-start md:items-end gap-4"
           >
             <a
-              href={WHATSAPP_URL}
+              href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#C4A45A] text-[#060606] text-[10px] tracking-[0.3em] uppercase font-semibold overflow-hidden"
@@ -120,13 +123,13 @@ export default function HeroSection() {
               {/* Hover shimmer */}
               <span className="absolute inset-0 bg-white/10 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-700 skew-x-12" />
               <WhatsAppIcon />
-              <span className="relative">Begin Your Experience</span>
+              <span className="relative">{tx.hero.cta}</span>
               <ArrowIcon />
             </a>
 
             {/* Trust micro-copy */}
             <p className="text-[8.5px] tracking-[0.22em] text-[#6A6050] uppercase">
-              Instant response · No booking fees
+              {tx.hero.trust}
             </p>
           </motion.div>
         </div>

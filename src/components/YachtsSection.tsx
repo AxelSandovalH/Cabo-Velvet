@@ -5,6 +5,10 @@ import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { DBListing } from "@/lib/listings";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n/translations";
+
+const WHATSAPP_NUMBER = "526241234567";
 
 type Card = { id: string; href: string; name: string; tagline: string; detail: string; image: string }
 
@@ -19,12 +23,13 @@ function fromDB(listings: DBListing[]): Card[] {
   }))
 }
 
-const WA_YACHTS = `https://wa.me/526241234567?text=${encodeURIComponent("Hi, I'd like to see the available yachts in Los Cabos.")}`
-
 export default function YachtsSection({ listings }: { listings?: DBListing[] }) {
   const headerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(headerRef, { once: true, margin: "-80px" });
   const cards = listings?.length ? fromDB(listings) : [];
+  const { lang } = useLanguage();
+  const tx = t[lang];
+  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tx.yachts.waMessage)}`;
 
   return (
     <section id="yachts" className="bg-[#080808]">
@@ -42,7 +47,7 @@ export default function YachtsSection({ listings }: { listings?: DBListing[] }) 
               className="flex items-center gap-3 mb-5"
             >
               <div className="w-5 h-px bg-[#C4A45A]" />
-              <span className="text-[9px] tracking-[0.4em] text-[#C4A45A] uppercase">Yacht Fleet</span>
+              <span className="text-[9px] tracking-[0.4em] text-[#C4A45A] uppercase">{tx.yachts.label}</span>
             </motion.div>
             <motion.h2
               initial={{ opacity: 0, y: 18 }}
@@ -51,19 +56,19 @@ export default function YachtsSection({ listings }: { listings?: DBListing[] }) 
               className="font-display font-light text-[#F2EDE4] leading-[0.92]"
               style={{ fontFamily: "var(--font-cormorant)", fontSize: "clamp(2.4rem, 6vw, 4.5rem)" }}
             >
-              Private<br /><span className="italic text-[#C4A45A]">Charters.</span>
+              {tx.yachts.heading}<br /><span className="italic text-[#C4A45A]">{tx.yachts.heading_italic}</span>
             </motion.h2>
           </div>
           <motion.a
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.25 }}
-            href={WA_YACHTS}
+            href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="self-start text-[9px] tracking-[0.28em] text-[#6A6050] uppercase hover:text-[#C4A45A] transition-colors duration-300 pb-0.5"
           >
-            Consultar disponibilidad →
+            {tx.yachts.availability}
           </motion.a>
         </div>
 
@@ -88,7 +93,7 @@ export default function YachtsSection({ listings }: { listings?: DBListing[] }) 
             </div>
           </>
         ) : (
-          <ComingSoon waUrl={WA_YACHTS} label="yachts" />
+          <ComingSoon waUrl={waUrl} tx={tx.yachts} />
         )}
       </div>
     </section>
@@ -135,21 +140,20 @@ function YachtCard({ card, index }: { card: Card; index: number }) {
   );
 }
 
-function ComingSoon({ waUrl, label }: { waUrl: string; label: string }) {
+function ComingSoon({ waUrl, tx }: { waUrl: string; tx: { coming_soon: string; coming_cta: string } }) {
   return (
     <div className="px-6 md:px-14 lg:px-20 pb-20 md:pb-28">
       <div className="border border-white/[0.06] py-16 flex flex-col items-center gap-5 text-center">
-        <span className="text-[9px] tracking-[0.35em] text-[#6A6050] uppercase">Próximamente</span>
-        <p className="font-display font-light text-[#4A4038] text-2xl" style={{ fontFamily: "var(--font-cormorant)" }}>
-          Catálogo de {label} en camino
-        </p>
+        <span className="text-[9px] tracking-[0.35em] text-[#6A6050] uppercase">
+          {tx.coming_soon}
+        </span>
         <a
           href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-2 inline-flex items-center gap-2 px-7 py-3 border border-[#C4A45A]/30 text-[#C4A45A] text-[10px] tracking-[0.22em] uppercase hover:bg-[#C4A45A] hover:text-[#080808] transition-all duration-300"
         >
-          Consultar por WhatsApp →
+          {tx.coming_cta}
         </a>
       </div>
     </div>

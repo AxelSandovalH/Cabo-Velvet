@@ -6,19 +6,9 @@ import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { DBListing } from "@/lib/listings";
-
-// ── Category definitions ────────────────────────────────────────────────────
-
-const CATS = [
-  { id: "all",       label: "Todo" },
-  { id: "mar",       label: "Mar" },
-  { id: "ballenas",  label: "Ballenas" },
-  { id: "aventura",  label: "Aventura" },
-  { id: "buceo",     label: "Buceo" },
-  { id: "delfines",  label: "Delfines" },
-  { id: "tours",     label: "Tours" },
-  { id: "privado",   label: "Privado" },
-]
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n/translations";
+import { expandQuery } from "@/lib/i18n/search";
 
 function deriveCat(name: string): string {
   const n = name.toLowerCase()
@@ -38,23 +28,42 @@ function deriveCat(name: string): string {
 
 const FALLBACK_IMG = "https://images.unsplash.com/photo-1543158266-0066955a5f89?w=800&q=80&auto=format&fit=crop"
 
-// ── Main component ──────────────────────────────────────────────────────────
-
 export default function ExperiencesSection({ listings }: { listings?: DBListing[] }) {
   const headerRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(headerRef, { once: true, margin: "-80px" })
+  const { lang } = useLanguage()
+  const tx = t[lang]
 
   const [query, setQuery] = useState("")
   const [activeCat, setActiveCat] = useState("all")
 
+  const CATS = [
+    { id: "all",      label: tx.experiences.cat_all },
+    { id: "mar",      label: tx.experiences.cat_mar },
+    { id: "ballenas", label: tx.experiences.cat_ballenas },
+    { id: "aventura", label: tx.experiences.cat_aventura },
+    { id: "buceo",    label: tx.experiences.cat_buceo },
+    { id: "delfines", label: tx.experiences.cat_delfines },
+    { id: "tours",    label: tx.experiences.cat_tours },
+    { id: "privado",  label: tx.experiences.cat_privado },
+  ]
+
   const filtered = useMemo(() => {
     if (!listings?.length) return []
+    const terms = query ? expandQuery(query) : []
     return listings.filter((l) => {
       const matchesCat = activeCat === "all" || deriveCat(l.name) === activeCat
-      const matchesQ = !query || l.name.toLowerCase().includes(query.toLowerCase())
+      const matchesQ = !query || terms.some((term) =>
+        l.name.toLowerCase().includes(term) ||
+        l.tagline?.toLowerCase().includes(term) ||
+        l.location?.toLowerCase().includes(term)
+      )
       return matchesCat && matchesQ
     })
   }, [listings, activeCat, query])
+
+  const resultCount = filtered.length
+  const resultLabel = resultCount === 1 ? tx.experiences.experience : tx.experiences.experiences
 
   return (
     <section id="experiences" className="bg-[#080808]">
@@ -69,7 +78,7 @@ export default function ExperiencesSection({ listings }: { listings?: DBListing[
           className="flex items-center gap-3 mb-4"
         >
           <div className="w-5 h-px bg-[#C4A45A]" />
-          <span className="text-[9px] tracking-[0.38em] text-[#C4A45A] uppercase">Curated Experiences</span>
+          <span className="text-[9px] tracking-[0.38em] text-[#C4A45A] uppercase">{tx.experiences.label}</span>
         </motion.div>
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -78,7 +87,7 @@ export default function ExperiencesSection({ listings }: { listings?: DBListing[
           className="font-display font-light leading-tight text-[#F2EDE4] mb-8"
           style={{ fontFamily: "var(--font-cormorant)", fontSize: "clamp(2.2rem, 5.5vw, 4rem)" }}
         >
-          Moments crafted <span className="italic text-[#C4A45A]">for memory.</span>
+          {tx.experiences.heading} <span className="italic text-[#C4A45A]">{tx.experiences.heading_italic}</span>
         </motion.h2>
 
         {/* Search */}
@@ -91,7 +100,7 @@ export default function ExperiencesSection({ listings }: { listings?: DBListing[
           <SearchIcon />
           <input
             type="text"
-            placeholder="Buscar experiencia…"
+            placeholder={tx.experiences.search_placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full bg-white/[0.04] border border-white/[0.08] text-[#F2EDE4] placeholder-[#5A5040] text-sm pl-10 pr-4 py-3 outline-none focus:border-[#C4A45A]/40 transition-colors duration-200"
@@ -134,12 +143,12 @@ export default function ExperiencesSection({ listings }: { listings?: DBListing[
       <div className="px-6 md:px-12 lg:px-16 max-w-7xl mx-auto pb-24 md:pb-32">
         {filtered.length === 0 ? (
           <p className="text-[#6A6050] text-sm py-16 text-center">
-            {listings?.length ? "Sin resultados. Prueba otra búsqueda." : "Cargando experiencias…"}
+            {listings?.length ? tx.experiences.no_results : tx.experiences.loading}
           </p>
         ) : (
           <>
             <p className="text-[9px] tracking-[0.25em] text-[#5A5040] uppercase mb-6">
-              {filtered.length} experiencia{filtered.length !== 1 ? "s" : ""}
+              {resultCount} {resultLabel}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
               {filtered.map((listing, i) => (
@@ -152,8 +161,6 @@ export default function ExperiencesSection({ listings }: { listings?: DBListing[
     </section>
   )
 }
-
-// ── Card ────────────────────────────────────────────────────────────────────
 
 function ExperienceCard({ listing, index }: { listing: DBListing; index: number }) {
   const ref = useRef<HTMLDivElement>(null)

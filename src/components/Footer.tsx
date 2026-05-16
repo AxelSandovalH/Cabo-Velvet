@@ -1,20 +1,23 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n/translations";
 
 const WHATSAPP_NUMBER = "526241234567";
-const WHATSAPP_MSG = encodeURIComponent("Hi, I'd like to learn more about Cabo Rico.");
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`;
-
-const navLinks = [
-  { label: "Experiences", anchor: "#experiences" },
-  { label: "Villas",       anchor: "#villas" },
-  { label: "Yachts",       anchor: "#yachts" },
-  { label: "Services",     anchor: "#services" },
-];
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { lang } = useLanguage();
+  const tx = t[lang];
+  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tx.footer.waMessage)}`;
+
+  const navLinks = [
+    { label: tx.nav.experiences, anchor: "#experiences" },
+    { label: tx.nav.villas,      anchor: "#villas" },
+    { label: tx.nav.yachts,      anchor: "#yachts" },
+    { label: "Services",         anchor: "#services" },
+  ];
 
   return (
     <footer className="bg-[#080808] border-t border-white/[0.04]">
@@ -34,23 +37,23 @@ export default function Footer() {
               </p>
             </div>
             <p className="text-[#7A7060] text-sm leading-relaxed font-light max-w-sm mb-8">
-              Directorio de lujo en Los Cabos. Tours, yates, villas y experiencias curadas — todo gestionado por WhatsApp.
+              {tx.footer.description}
             </p>
             <a
-              href={WHATSAPP_URL}
+              href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2.5 text-[#C4A45A] text-[10px] tracking-[0.2em] uppercase hover:gap-4 transition-all duration-300"
             >
               <WhatsAppIcon />
-              <span>Escríbenos</span>
+              <span>{tx.footer.contact}</span>
             </a>
           </div>
 
           {/* Nav */}
           <div>
             <h4 className="text-[9px] tracking-[0.3em] text-[#C4A45A] uppercase mb-5">
-              Explorar
+              {tx.footer.explore}
             </h4>
             <ul className="space-y-3">
               {navLinks.map((link) => (
@@ -65,7 +68,7 @@ export default function Footer() {
               ))}
               <li>
                 <a
-                  href={WHATSAPP_URL}
+                  href={waUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#7A7060] text-sm font-light hover:text-[#9A9080] transition-colors duration-200"
@@ -82,7 +85,7 @@ export default function Footer() {
       <div className="border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-[#5A5040] text-[10px] tracking-[0.15em] uppercase">
-            © {year} Cabo Rico. All rights reserved.
+            © {year} Cabo Rico. {tx.footer.rights}
           </p>
           <span className="text-[#5A5040] text-[10px] tracking-[0.15em] uppercase">
             caboricotours.com
