@@ -47,6 +47,8 @@ export async function POST(req: NextRequest) {
     const messageText = String(data.body ?? '').trim()
     if (!messageText) return NextResponse.json({ status: 'ok' })
 
+    console.log('[concierge] incoming phone:', phone, '| allowed:', isAllowed(phone), '| allowlist:', ALLOWED_PHONES)
+
     if (!isAllowed(phone)) {
       console.log('[concierge] blocked:', phone)
       return NextResponse.json({ status: 'ok' })
