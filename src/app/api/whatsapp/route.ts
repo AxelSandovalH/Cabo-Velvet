@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+export const maxDuration = 60
 import { supabase } from '@/lib/supabase'
 import { runConcierge, Message, LeadContext } from '@/lib/concierge/agent'
 import { sendWhatsApp } from '@/lib/concierge/ultramsg'
