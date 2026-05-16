@@ -36,13 +36,14 @@ export const tools: Anthropic.Tool[] = [
   },
   {
     name: 'create_payment_link',
-    description: 'Generate a Stripe payment link. Call when client is ready to book. Always pass phone and name (if you have it).',
+    description: 'Generate a Stripe payment link. Call when client is ready to book. Always pass phone and name (if you have it). Pass quantity = number of people so the total is correct.',
     input_schema: {
       type: 'object' as const,
       properties: {
         listing_id: { type: 'string', description: 'Listing UUID to create payment for' },
         phone: { type: 'string', description: 'Client phone identifier from system prompt' },
         name: { type: 'string', description: 'Client name for the booking record' },
+        quantity: { type: 'number', description: 'Number of people / units. Defaults to 1 if not provided. Always set this based on what the client told you.' },
       },
       required: ['listing_id', 'phone'],
     },
@@ -117,7 +118,8 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
       }
 
       case 'create_payment_link': {
-        const { listing_id, phone: clientPhone, name: clientName } = input as { listing_id: string; phone?: string; name?: string }
+        const { listing_id, phone: clientPhone, name: clientName, quantity: rawQty } = input as { listing_id: string; phone?: string; name?: string; quantity?: number }
+        const quantity = Math.max(1, Math.round(rawQty ?? 1))
 
         if (!process.env.STRIPE_SECRET_KEY) {
           return JSON.stringify({ error: 'Stripe not configured — tell the user to contact us via WhatsApp to book' })
@@ -140,7 +142,7 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
             mode: 'payment',
             payment_method_types: ['card'],
             line_items: [{
-              quantity: 1,
+              quantity,
               price_data: {
                 currency: 'usd',
                 unit_amount: Math.round(listing.price * 100),
@@ -150,7 +152,7 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
                 },
               },
             }],
-            metadata: { listingId: listing.id },
+            metadata: { listingId: listing.id, quantity: String(quantity) },
             success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${siteUrl}/checkout/cancel`,
           })
@@ -170,10 +172,11 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
           status: 'link_sent',
           phone: clientPhone ?? null,
           name: clientName ?? null,
-          amount: Math.round(listing.price * 100),
+          amount: Math.round(listing.price * 100) * quantity,
         })
 
-        return JSON.stringify({ payment_url: session.url, listing_name: listing.name, price: listing.price })
+        const total = listing.price * quantity
+        return JSON.stringify({ payment_url: session.url, listing_name: listing.name, price_per_person: listing.price, quantity, total })
       }
 
       case 'save_lead_info': {
