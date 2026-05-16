@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { fetchListingById, formatPrice } from '@/lib/listings'
 import LuxuryDetailLayout from '@/components/LuxuryDetailLayout'
 
-const WHATSAPP = '526241234567'
+const WHATSAPP = '523141222146'
 const CATEGORY_LABEL: Record<string, string> = {
   villa: 'Villas',
   yacht: 'Yachts',

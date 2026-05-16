@@ -19,7 +19,7 @@ function fromDB(listings: DBListing[]): Card[] {
   }))
 }
 
-const WA_VILLAS = `https://wa.me/526241234567?text=${encodeURIComponent("Hi, I'd like to see available villas in Los Cabos.")}`
+const WA_VILLAS = `https://wa.me/523141222146?text=${encodeURIComponent("Hi, I'd like to see available villas in Los Cabos.")}`
 
 export default function VillasSection({ listings }: { listings?: DBListing[] }) {
   const headerRef = useRef<HTMLDivElement>(null);

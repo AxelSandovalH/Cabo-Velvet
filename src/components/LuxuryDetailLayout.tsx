@@ -26,7 +26,7 @@ interface Props {
   listingId?: string;
 }
 
-const WHATSAPP_NUMBER = "526241234567";
+const WHATSAPP_NUMBER = "523141222146";
 
 export default function LuxuryDetailLayout({
   category,

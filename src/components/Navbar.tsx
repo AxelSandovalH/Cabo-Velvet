@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n/translations";
 
-const WHATSAPP_NUMBER = "526241234567";
+const WHATSAPP_NUMBER = "523141222146";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);

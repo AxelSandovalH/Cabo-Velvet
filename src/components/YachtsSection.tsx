@@ -8,7 +8,7 @@ import type { DBListing } from "@/lib/listings";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n/translations";
 
-const WHATSAPP_NUMBER = "526241234567";
+const WHATSAPP_NUMBER = "523141222146";
 
 type Card = { id: string; href: string; name: string; tagline: string; detail: string; image: string }
 
