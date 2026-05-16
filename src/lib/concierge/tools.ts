@@ -116,36 +116,51 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
 
       case 'create_payment_link': {
         const { listing_id } = input as { listing_id: string }
+
+        if (!process.env.STRIPE_SECRET_KEY) {
+          return JSON.stringify({ error: 'Stripe not configured — tell the user to contact us via WhatsApp to book' })
+        }
+
         const { data: listing, error } = await supabase
           .from('listings')
           .select('id, name, tagline, price')
           .eq('id', listing_id)
           .eq('active', true)
           .single()
-        if (error || !listing) return JSON.stringify({ error: 'Listing not found' })
-        if (!listing.price) return JSON.stringify({ error: 'This listing has no price configured' })
+        if (error || !listing) return JSON.stringify({ error: 'Listing not found — search again and use the correct id' })
+        if (!listing.price) return JSON.stringify({ error: 'This listing has no price — tell user to contact via WhatsApp' })
 
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://cabo-velvet.vercel.app'
-        const session = await getStripe().checkout.sessions.create({
-          mode: 'payment',
-          payment_method_types: ['card'],
-          line_items: [{
-            quantity: 1,
-            price_data: {
-              currency: 'usd',
-              unit_amount: Math.round(listing.price * 100),
-              product_data: {
-                name: listing.name,
-                ...(listing.tagline ? { description: listing.tagline } : {}),
+        const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? '').replace(/\/$/, '') || 'https://cabo-velvet.vercel.app'
+
+        let session
+        try {
+          session = await getStripe().checkout.sessions.create({
+            mode: 'payment',
+            payment_method_types: ['card'],
+            line_items: [{
+              quantity: 1,
+              price_data: {
+                currency: 'usd',
+                unit_amount: Math.round(listing.price * 100),
+                product_data: {
+                  name: listing.name,
+                  ...(listing.tagline ? { description: listing.tagline } : {}),
+                },
               },
-            },
-          }],
-          metadata: { listingId: listing.id },
-          success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${siteUrl}/checkout/cancel`,
-        })
+            }],
+            metadata: { listingId: listing.id },
+            success_url: `${siteUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${siteUrl}/checkout/cancel`,
+          })
+        } catch (stripeErr) {
+          console.error('[stripe error]', stripeErr)
+          return JSON.stringify({ error: `Stripe error: ${String(stripeErr)} — tell user to contact via WhatsApp` })
+        }
 
-        // Save booking intent
+        if (!session?.url) {
+          return JSON.stringify({ error: 'Stripe did not return a URL — tell user to contact via WhatsApp' })
+        }
+
         await supabase.from('bookings').insert({
           listing_id: listing.id,
           stripe_session_id: session.id,
