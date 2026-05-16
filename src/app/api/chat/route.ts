@@ -12,22 +12,21 @@ export async function POST(req: NextRequest) {
 
     const identifier = `web_${sessionId}`
 
-    // Load or create conversation
+    // Load conversation
     const { data: conv } = await supabase
       .from('conversations')
       .select('messages, name, group_size, travel_date, budget_range, interests')
       .eq('phone', identifier)
-      .single()
+      .maybeSingle()
 
     const history: Message[] = Array.isArray(conv?.messages) ? conv.messages : []
 
-    if (!conv) {
-      await supabase.from('conversations').insert({
-        phone: identifier,
-        messages: [],
-        lead_status: 'new',
-      })
-    }
+    // Save user message immediately before running agent (prevents race condition)
+    const historyWithUser: Message[] = [...history, { role: 'user' as const, content: message.trim() }]
+    await supabase.from('conversations').upsert(
+      { phone: identifier, messages: historyWithUser, updated_at: new Date().toISOString() },
+      { onConflict: 'phone' }
+    )
 
     const lead: LeadContext = {
       name: conv?.name,
