@@ -2,6 +2,7 @@
 import { Inter } from "next/font/google";
 import { Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
+import ChatWidget from "@/components/ChatWidget";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -67,6 +68,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col antialiased bg-[#080808] text-[#F2EDE4] overflow-x-hidden">
         {children}
+        <ChatWidget />
       </body>
     </html>
   );
