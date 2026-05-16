@@ -61,7 +61,14 @@ export default async function DashboardPage() {
   return (
     <div className="h-screen flex flex-col bg-[#080808] text-[#F2EDE4]">
       <header className="flex-shrink-0 border-b border-white/10 bg-[#080808]/95 backdrop-blur px-4 sm:px-8 py-4 flex items-center justify-between gap-4">
-        <h1 className="text-base sm:text-xl font-semibold tracking-wide truncate">Cabo Rico — Imágenes</h1>
+        <div className="flex items-center gap-6 min-w-0">
+          <h1 className="text-base sm:text-xl font-semibold tracking-wide truncate">Cabo Rico — Imágenes</h1>
+          <nav className="hidden sm:flex items-center gap-1">
+            <a href="/admin/dashboard" className="text-xs px-3 py-1.5 rounded-lg bg-white/[0.08] text-white/80">Imágenes</a>
+            <a href="/admin/listings" className="text-xs px-3 py-1.5 rounded-lg text-white/40 hover:text-white/70 hover:bg-white/[0.05] transition-colors">Actividades</a>
+            <a href="/admin/concierge" className="text-xs px-3 py-1.5 rounded-lg text-white/40 hover:text-white/70 hover:bg-white/[0.05] transition-colors">Concierge</a>
+          </nav>
+        </div>
         <form action="/api/admin/logout" method="POST" className="flex-shrink-0">
           <button className="text-sm text-white/40 hover:text-white/80 transition-colors">Salir</button>
         </form>
