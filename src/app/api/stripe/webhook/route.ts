@@ -23,15 +23,20 @@ export async function POST(req: NextRequest) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
 
+    const meta = session.metadata ?? {}
     const { data: booking } = await supabase
       .from('bookings')
       .update({
         status: 'confirmed',
         confirmed_at: new Date().toISOString(),
         stripe_payment_intent_id: String(session.payment_intent ?? ''),
+        ...(meta.bookingDate ? { booking_date: meta.bookingDate } : {}),
+        ...(meta.peopleCount ? { people_count: parseInt(meta.peopleCount) } : {}),
+        ...(meta.guestName ? { name: meta.guestName } : {}),
+        ...(meta.guestPhone ? { phone: meta.guestPhone } : {}),
       })
       .eq('stripe_session_id', session.id)
-      .select('phone, name')
+      .select('phone, name, booking_date, people_count')
       .single()
 
     if (booking?.phone) {
@@ -41,9 +46,13 @@ export async function POST(req: NextRequest) {
         .eq('phone', booking.phone)
 
       const nombre = booking.name ? `, ${booking.name}` : ''
+      const dateStr = booking.booking_date
+        ? ` para el ${new Date(booking.booking_date + 'T12:00:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}`
+        : ''
+      const paxStr = booking.people_count && booking.people_count > 1 ? ` (${booking.people_count} personas)` : ''
       await sendWhatsApp(
         `52${booking.phone}`,
-        `✅ ¡Reserva confirmada${nombre}! Tu experiencia está apartada. Te contactamos 24h antes con todos los detalles. ¡Gracias por elegir Cabo Rico! 🌊`
+        `✅ ¡Reserva confirmada${nombre}!${dateStr}${paxStr}\n\nTu lugar está apartado. Te contactamos 24h antes con todos los detalles. ¡Gracias por elegir Cabo Rico! 🌊`
       )
     }
 

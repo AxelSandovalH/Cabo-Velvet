@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import CheckoutButton from "./CheckoutButton";
+import BookingWidget from "./BookingWidget";
 
 interface Spec { label: string; value: string }
 
@@ -21,9 +22,12 @@ interface Props {
   specs: Spec[];
   includes: string[];
   price: string;
+  priceRaw: number | null;
+  priceUnit: string | null;
   durationOrStay: string;
   whatsappMsg: string;
   listingId?: string;
+  capacity?: number | null;
 }
 
 const WHATSAPP_NUMBER = "523141222146";
@@ -42,9 +46,12 @@ export default function LuxuryDetailLayout({
   specs,
   includes,
   price,
+  priceRaw,
+  priceUnit,
   durationOrStay,
   whatsappMsg,
   listingId,
+  capacity,
 }: Props) {
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMsg)}`;
   const sub = location ?? model ?? "";
@@ -269,25 +276,37 @@ export default function LuxuryDetailLayout({
               {durationOrStay}
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-col items-stretch sm:flex-row sm:items-center justify-center gap-3 mb-5 max-w-md mx-auto sm:max-w-none">
-              {listingId && <CheckoutButton listingId={listingId} />}
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 bg-[#C4A45A] text-[#060606] text-[11px] tracking-[0.28em] uppercase font-semibold overflow-hidden hover:bg-[#D4B468] active:opacity-90 transition-colors duration-300 w-full sm:w-auto"
-              >
-                <span className="absolute inset-0 bg-white/10 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-700 skew-x-12" />
-                <WhatsAppIcon />
-                <span className="relative">Inquire on WhatsApp</span>
-                <ArrowIcon />
-              </a>
-            </div>
+            {/* Booking widget or simple checkout */}
+            {listingId && priceRaw && capacity != null ? (
+              <div className="text-left mb-8">
+                <BookingWidget
+                  listingId={listingId}
+                  price={priceRaw}
+                  priceUnit={priceUnit}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-stretch sm:flex-row sm:items-center justify-center gap-3 mb-5 max-w-md mx-auto sm:max-w-none">
+                {listingId && <CheckoutButton listingId={listingId} />}
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 bg-[#C4A45A] text-[#060606] text-[11px] tracking-[0.28em] uppercase font-semibold overflow-hidden hover:bg-[#D4B468] active:opacity-90 transition-colors duration-300 w-full sm:w-auto"
+                >
+                  <span className="absolute inset-0 bg-white/10 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-700 skew-x-12" />
+                  <WhatsAppIcon />
+                  <span className="relative">Inquire on WhatsApp</span>
+                  <ArrowIcon />
+                </a>
+              </div>
+            )}
 
-            <p className="text-[8.5px] tracking-[0.22em] text-[#2A2018] uppercase">
-              Instant response · No booking fees · 100% private
-            </p>
+            {(!listingId || !priceRaw || capacity == null) && (
+              <p className="text-[8.5px] tracking-[0.22em] text-[#2A2018] uppercase">
+                Instant response · No booking fees · 100% private
+              </p>
+            )}
           </motion.div>
         </div>
       </section>

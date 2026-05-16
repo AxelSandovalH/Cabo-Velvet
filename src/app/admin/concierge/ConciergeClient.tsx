@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 
 type Conversation = {
@@ -63,6 +63,159 @@ const BOOKING_LABELS: Record<string, string> = {
   cancelled: 'Cancelado',
 }
 
+const CAL_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+const CAL_DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa']
+
+type CalBooking = {
+  id: string
+  listing_id: string
+  listing_name: string
+  name: string | null
+  phone: string | null
+  people_count: number | null
+  status: string
+  amount: number | null
+  booking_date: string
+}
+
+function CalendarioTab() {
+  const today = new Date()
+  const [year, setYear] = useState(today.getFullYear())
+  const [month, setMonth] = useState(today.getMonth() + 1)
+  const [data, setData] = useState<Record<string, CalBooking[]>>({})
+  const [loading, setLoading] = useState(false)
+  const [selectedDay, setSelectedDay] = useState<string | null>(null)
+
+  const monthParam = `${year}-${String(month).padStart(2, '0')}`
+
+  const fetchData = useCallback(async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/admin/availability?month=${monthParam}`)
+      const json = await res.json()
+      setData(json)
+    } finally {
+      setLoading(false)
+    }
+  }, [monthParam])
+
+  useEffect(() => { fetchData() }, [fetchData])
+
+  function prevMonth() {
+    if (month === 1) { setYear(y => y - 1); setMonth(12) } else setMonth(m => m - 1)
+    setSelectedDay(null)
+  }
+  function nextMonth() {
+    if (month === 12) { setYear(y => y + 1); setMonth(1) } else setMonth(m => m + 1)
+    setSelectedDay(null)
+  }
+
+  const firstDow = new Date(year, month - 1, 1).getDay()
+  const daysInMonth = new Date(year, month, 0).getDate()
+  const cells: (number | null)[] = [
+    ...Array(firstDow).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ]
+  while (cells.length % 7 !== 0) cells.push(null)
+
+  const selectedBookings = selectedDay ? (data[selectedDay] ?? []) : []
+
+  return (
+    <div className="h-full flex overflow-hidden">
+      {/* Calendar */}
+      <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex items-center justify-between mb-5">
+          <button onClick={prevMonth} className="p-2 text-white/30 hover:text-white/70 transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span className="text-[12px] tracking-[0.28em] uppercase text-[#F2EDE4]">
+            {CAL_MONTHS[month - 1]} {year}
+          </span>
+          <button onClick={nextMonth} className="p-2 text-white/30 hover:text-white/70 transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-7 mb-1">
+          {CAL_DAYS.map(d => (
+            <div key={d} className="text-center text-[9px] tracking-[0.2em] text-white/25 uppercase py-1">{d}</div>
+          ))}
+        </div>
+
+        <div className={`grid grid-cols-7 gap-1 transition-opacity ${loading ? 'opacity-40' : ''}`}>
+          {cells.map((d, i) => {
+            if (!d) return <div key={i} />
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+            const dayBookings = data[dateStr] ?? []
+            const isSelected = selectedDay === dateStr
+            const hasBookings = dayBookings.length > 0
+            const totalPax = dayBookings.reduce((s, b) => s + (b.people_count ?? 1), 0)
+            const isToday = dateStr === today.toISOString().slice(0, 10)
+
+            return (
+              <button
+                key={i}
+                onClick={() => setSelectedDay(isSelected ? null : dateStr)}
+                className={`min-h-[56px] rounded-lg p-1.5 text-left transition-all border ${
+                  isSelected
+                    ? 'bg-[#C4A45A]/20 border-[#C4A45A]/50'
+                    : hasBookings
+                    ? 'bg-white/[0.04] border-white/[0.08] hover:border-white/20'
+                    : 'border-transparent hover:bg-white/[0.03]'
+                }`}
+              >
+                <span className={`text-[11px] font-medium ${isToday ? 'text-[#C4A45A]' : 'text-white/50'}`}>{d}</span>
+                {hasBookings && (
+                  <div className="mt-1">
+                    <span className="text-[9px] text-emerald-400">{dayBookings.length} res · {totalPax} pax</span>
+                    {dayBookings.slice(0, 2).map((b) => (
+                      <p key={b.id} className="text-[9px] text-white/30 truncate leading-tight">{b.listing_name}</p>
+                    ))}
+                  </div>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Day detail panel */}
+      {selectedDay && (
+        <div className="w-72 flex-shrink-0 border-l border-white/[0.06] overflow-y-auto p-4">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[11px] tracking-[0.22em] text-[#C4A45A] uppercase">
+              {new Date(selectedDay + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            </p>
+            <button onClick={() => setSelectedDay(null)} className="text-white/25 hover:text-white/60 transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          {selectedBookings.length === 0 ? (
+            <p className="text-white/20 text-xs text-center py-8">Sin reservas</p>
+          ) : (
+            <div className="space-y-3">
+              {selectedBookings.map((b) => (
+                <div key={b.id} className="p-3 bg-white/[0.03] border border-white/[0.06] rounded-lg">
+                  <p className="text-[12px] font-medium text-[#F2EDE4]">{b.name ?? 'Sin nombre'}</p>
+                  <p className="text-[10px] text-white/40 mt-0.5">{b.listing_name}</p>
+                  <div className="flex items-center gap-3 mt-2 text-[10px] text-white/30">
+                    {b.people_count && <span>{b.people_count} pax</span>}
+                    {b.phone && <span>+52{b.phone}</span>}
+                    {b.amount && <span>{formatUSD(b.amount)}</span>}
+                  </div>
+                  <span className={`inline-block mt-2 text-[9px] px-1.5 py-0.5 rounded-full ${BOOKING_COLORS[b.status] ?? 'bg-white/10 text-white/40'}`}>
+                    {BOOKING_LABELS[b.status] ?? b.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60000)
@@ -87,7 +240,7 @@ export default function ConciergeClient({
   stats: Stats
 }) {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<'chats' | 'leads' | 'reservas' | 'analytics'>('chats')
+  const [activeTab, setActiveTab] = useState<'chats' | 'leads' | 'reservas' | 'calendario' | 'analytics'>('chats')
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [bookingFilter, setBookingFilter] = useState<string>('all')
@@ -126,7 +279,7 @@ export default function ConciergeClient({
       </header>
 
       <div className="flex-shrink-0 border-b border-white/[0.06] px-6 flex gap-0">
-        {(['chats', 'leads', 'reservas', 'analytics'] as const).map((tab) => (
+        {(['chats', 'leads', 'reservas', 'calendario', 'analytics'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -139,6 +292,7 @@ export default function ConciergeClient({
             {tab === 'chats' ? `Chats (${conversations.length})`
               : tab === 'leads' ? 'Leads'
               : tab === 'reservas' ? `Reservas (${bookings.length})`
+              : tab === 'calendario' ? 'Calendario'
               : 'Analytics'}
           </button>
         ))}
@@ -343,6 +497,9 @@ export default function ConciergeClient({
             </div>
           </div>
         )}
+
+        {/* CALENDARIO */}
+        {activeTab === 'calendario' && <CalendarioTab />}
 
         {/* ANALYTICS */}
         {activeTab === 'analytics' && (

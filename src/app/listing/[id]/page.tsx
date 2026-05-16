@@ -71,6 +71,9 @@ export default async function ListingPage({
       }
       whatsappMsg={whatsappMsg}
       listingId={listing.id}
+    priceRaw={listing.price}
+    priceUnit={listing.price_unit}
+    capacity={listing.capacity}
     />
   )
 }
