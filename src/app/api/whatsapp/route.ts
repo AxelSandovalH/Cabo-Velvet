@@ -7,12 +7,16 @@ const ALLOWED_PHONES = (process.env.ALLOWED_WA_PHONES ?? '')
   .split(',').map((p) => p.trim().replace(/\D/g, '')).filter(Boolean)
 
 function normalizePhone(raw: string): string {
-  return raw.replace('@c.us', '').replace(/\D/g, '').trim()
+  // Strip @c.us and non-digits, then keep last 10 digits (Mexican local number)
+  const digits = raw.replace('@c.us', '').replace(/\D/g, '').trim()
+  return digits.length > 10 ? digits.slice(-10) : digits
 }
 
 function isAllowed(phone: string): boolean {
   if (!ALLOWED_PHONES.length) return false
-  return ALLOWED_PHONES.some((p) => phone.endsWith(p) || p.endsWith(phone))
+  // Normalize allowlist entries the same way
+  const normalizedAllowed = ALLOWED_PHONES.map((p) => (p.length > 10 ? p.slice(-10) : p))
+  return normalizedAllowed.includes(phone)
 }
 
 export async function POST(req: NextRequest) {
