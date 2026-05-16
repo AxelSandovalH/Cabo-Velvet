@@ -11,16 +11,33 @@ export default async function ConciergePage() {
 
   const db = await createSupabaseAdmin()
 
-  const [{ data: conversations }, { data: bookings }] = await Promise.all([
+  const [{ data: conversations }, { data: bookings }, { data: allMessages }] = await Promise.all([
     db.from('conversations')
-      .select('id, phone, name, lead_status, interests, budget_range, travel_date, group_size, messages, updated_at, created_at')
+      .select('id, phone, name, lead_status, interests, budget_range, travel_date, group_size, updated_at, created_at')
       .order('updated_at', { ascending: false })
       .limit(100),
     db.from('bookings')
       .select('id, listing_id, stripe_url, status, created_at, conversation_id')
       .order('created_at', { ascending: false })
       .limit(50),
+    db.from('messages')
+      .select('phone, role, content, created_at')
+      .order('created_at', { ascending: true })
+      .limit(2000),
   ])
+
+  // Group messages by phone
+  const messagesByPhone: Record<string, { role: string; content: string }[]> = {}
+  for (const msg of (allMessages ?? [])) {
+    if (!messagesByPhone[msg.phone]) messagesByPhone[msg.phone] = []
+    messagesByPhone[msg.phone].push({ role: msg.role, content: msg.content })
+  }
+
+  // Attach messages to conversations
+  const conversationsWithMessages = (conversations ?? []).map((c) => ({
+    ...c,
+    messages: messagesByPhone[c.phone] ?? [],
+  }))
 
   // Analytics
   const total = conversations?.length ?? 0
@@ -30,7 +47,7 @@ export default async function ConciergePage() {
 
   return (
     <ConciergeClient
-      conversations={conversations ?? []}
+      conversations={conversationsWithMessages}
       bookings={bookings ?? []}
       stats={{ total, qualified, converted, linksSent }}
     />
