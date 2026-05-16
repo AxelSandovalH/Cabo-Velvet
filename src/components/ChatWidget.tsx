@@ -193,7 +193,7 @@ export default function ChatWidget() {
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-4 sm:right-6 z-50 w-14 h-14 rounded-full bg-[#C4A45A] shadow-lg shadow-[#C4A45A]/25 flex items-center justify-center"
+        className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-full bg-[#C4A45A] shadow-lg shadow-[#C4A45A]/25 flex items-center justify-center"
       >
         <AnimatePresence mode="wait">
           {open ? (
