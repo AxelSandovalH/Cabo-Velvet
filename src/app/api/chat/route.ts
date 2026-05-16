@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { runConcierge, Message } from '@/lib/concierge/agent'
+import { runConcierge, Message, LeadContext } from '@/lib/concierge/agent'
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     // Load or create conversation
     const { data: conv } = await supabase
       .from('conversations')
-      .select('messages')
+      .select('messages, name, group_size, travel_date, budget_range, interests')
       .eq('phone', identifier)
       .single()
 
@@ -29,7 +29,15 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const { reply, updatedHistory } = await runConcierge(history, message.trim(), identifier)
+    const lead: LeadContext = {
+      name: conv?.name,
+      group_size: conv?.group_size,
+      travel_date: conv?.travel_date,
+      budget_range: conv?.budget_range,
+      interests: conv?.interests,
+    }
+
+    const { reply, updatedHistory } = await runConcierge(history, message.trim(), identifier, lead)
 
     await supabase
       .from('conversations')

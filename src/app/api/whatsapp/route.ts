@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { runConcierge, Message } from '@/lib/concierge/agent'
+import { runConcierge, Message, LeadContext } from '@/lib/concierge/agent'
 import { sendWhatsApp } from '@/lib/concierge/ultramsg'
 
 // Only these numbers can chat with the concierge (allowlist)
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     // Load or create conversation
     const { data: conv } = await supabase
       .from('conversations')
-      .select('messages, name')
+      .select('messages, name, group_size, travel_date, budget_range, interests')
       .eq('phone', phone)
       .single()
 
@@ -57,8 +57,16 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    const lead: LeadContext = {
+      name: conv?.name,
+      group_size: conv?.group_size,
+      travel_date: conv?.travel_date,
+      budget_range: conv?.budget_range,
+      interests: conv?.interests,
+    }
+
     // Run concierge agent
-    const { reply, updatedHistory } = await runConcierge(history, messageText, phone)
+    const { reply, updatedHistory } = await runConcierge(history, messageText, phone, lead)
 
     // Persist updated history
     await supabase
