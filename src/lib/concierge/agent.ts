@@ -37,7 +37,7 @@ export async function runConcierge(
     ? `\n\n## DATOS YA CAPTURADOS DE ESTE CLIENTE — NO LOS VUELVAS A PREGUNTAR\n${knownFacts.join('\n')}`
     : ''
 
-  const systemText = `${SYSTEM_PROMPT}${contextBlock}\n\nIdentificador del cliente: ${phone}. Usa este valor en save_lead_info.`
+  const systemText = `${SYSTEM_PROMPT}${contextBlock}\n\nIdentificador del cliente: ${phone}. Usa este valor como phone en save_lead_info y en create_payment_link.`
 
   const messages: Anthropic.MessageParam[] = [
     ...trimmedHistory.map((m) => ({ role: m.role, content: m.content })),

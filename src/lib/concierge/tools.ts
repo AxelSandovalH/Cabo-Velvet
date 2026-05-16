@@ -36,13 +36,15 @@ export const tools: Anthropic.Tool[] = [
   },
   {
     name: 'create_payment_link',
-    description: 'Generate a Stripe payment link for a specific listing. Use this when the client is ready to book.',
+    description: 'Generate a Stripe payment link. Call when client is ready to book. Always pass phone and name (if you have it).',
     input_schema: {
       type: 'object' as const,
       properties: {
         listing_id: { type: 'string', description: 'Listing UUID to create payment for' },
+        phone: { type: 'string', description: 'Client phone identifier from system prompt' },
+        name: { type: 'string', description: 'Client name for the booking record' },
       },
-      required: ['listing_id'],
+      required: ['listing_id', 'phone'],
     },
   },
   {
@@ -115,7 +117,7 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
       }
 
       case 'create_payment_link': {
-        const { listing_id } = input as { listing_id: string }
+        const { listing_id, phone: clientPhone, name: clientName } = input as { listing_id: string; phone?: string; name?: string }
 
         if (!process.env.STRIPE_SECRET_KEY) {
           return JSON.stringify({ error: 'Stripe not configured — tell the user to contact us via WhatsApp to book' })
@@ -166,6 +168,9 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
           stripe_session_id: session.id,
           stripe_url: session.url,
           status: 'link_sent',
+          phone: clientPhone ?? null,
+          name: clientName ?? null,
+          amount: Math.round(listing.price * 100),
         })
 
         return JSON.stringify({ payment_url: session.url, listing_name: listing.name, price: listing.price })
