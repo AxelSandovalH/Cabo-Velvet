@@ -78,7 +78,7 @@ export async function runConcierge(
       if (block.type === 'text') reply += block.text
     }
   }
-  if (!reply) reply = 'Un momento, estoy revisando las opciones para ti. 🙏'
+  if (!reply) reply = ''
 
   const updatedHistory: Message[] = ([
     ...trimmedHistory,

@@ -84,10 +84,10 @@ export async function POST(req: NextRequest) {
     const historyWithoutLast = history.slice(0, -1)
     const { reply } = await runConcierge(historyWithoutLast, messageText, phone, lead)
 
-    // Save assistant reply (atomic INSERT)
+    if (!reply) return NextResponse.json({ status: 'ok' })
+
     await saveMessage(phone, 'assistant', reply)
 
-    // Update conversation updated_at
     await supabase
       .from('conversations')
       .update({ updated_at: new Date().toISOString() })
