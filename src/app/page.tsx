@@ -26,9 +26,9 @@ export default async function HomePage() {
       <Navbar />
       <HeroSection />
       <CategoryBar />
+      <ExperiencesSection listings={experiences} />
       <VillasSection listings={villas} />
       <YachtsSection listings={yachts} />
-      <ExperiencesSection listings={experiences} />
       <ServicesSection listings={services} />
       <StatsSection />
       <CTASection />
