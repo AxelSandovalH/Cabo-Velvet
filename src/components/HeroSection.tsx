@@ -99,7 +99,7 @@ export default function HeroSection() {
             >
               Your Private Peninsula.
             </p>
-            <p className="mt-4 text-[#8A8070] text-[11px] tracking-[0.18em] uppercase font-light">
+            <p className="mt-4 text-[#A0907A] text-[11px] tracking-[0.18em] uppercase font-light">
               Yachts · Villas · Nightlife · Concierge
             </p>
           </motion.div>
@@ -125,7 +125,7 @@ export default function HeroSection() {
             </a>
 
             {/* Trust micro-copy */}
-            <p className="text-[8.5px] tracking-[0.22em] text-[#3A3028] uppercase">
+            <p className="text-[8.5px] tracking-[0.22em] text-[#6A6050] uppercase">
               Instant response · No booking fees
             </p>
           </motion.div>

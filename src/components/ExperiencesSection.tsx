@@ -94,12 +94,12 @@ export default function ExperiencesSection({ listings }: { listings?: DBListing[
             placeholder="Buscar experiencia…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full bg-white/[0.04] border border-white/[0.08] text-[#F2EDE4] placeholder-[#3A3028] text-sm pl-10 pr-4 py-3 outline-none focus:border-[#C4A45A]/40 transition-colors duration-200"
+            className="w-full bg-white/[0.04] border border-white/[0.08] text-[#F2EDE4] placeholder-[#5A5040] text-sm pl-10 pr-4 py-3 outline-none focus:border-[#C4A45A]/40 transition-colors duration-200"
           />
           {query && (
             <button
               onClick={() => setQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3A3028] hover:text-[#9A9080]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6A6050] hover:text-[#9A9080]"
             >
               ✕
             </button>
@@ -121,7 +121,7 @@ export default function ExperiencesSection({ listings }: { listings?: DBListing[
               className={`flex-shrink-0 px-4 py-1.5 text-[10px] tracking-[0.22em] uppercase font-medium transition-all duration-200 rounded-full border ${
                 activeCat === cat.id
                   ? "bg-[#C4A45A] border-[#C4A45A] text-[#080808]"
-                  : "border-white/[0.08] text-[#4A4038] hover:border-[#C4A45A]/30 hover:text-[#9A9080]"
+                  : "border-white/[0.08] text-[#8A8070] hover:border-[#C4A45A]/30 hover:text-[#9A9080]"
               }`}
             >
               {cat.label}
@@ -133,12 +133,12 @@ export default function ExperiencesSection({ listings }: { listings?: DBListing[
       {/* Grid */}
       <div className="px-6 md:px-12 lg:px-16 max-w-7xl mx-auto pb-24 md:pb-32">
         {filtered.length === 0 ? (
-          <p className="text-[#3A3028] text-sm py-16 text-center">
+          <p className="text-[#6A6050] text-sm py-16 text-center">
             {listings?.length ? "Sin resultados. Prueba otra búsqueda." : "Cargando experiencias…"}
           </p>
         ) : (
           <>
-            <p className="text-[9px] tracking-[0.25em] text-[#2A2018] uppercase mb-6">
+            <p className="text-[9px] tracking-[0.25em] text-[#5A5040] uppercase mb-6">
               {filtered.length} experiencia{filtered.length !== 1 ? "s" : ""}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
@@ -197,7 +197,7 @@ function ExperienceCard({ listing, index }: { listing: DBListing; index: number 
           {listing.name}
         </p>
         {listing.location && (
-          <p className="text-[#3A3028] text-[9px] tracking-[0.2em] uppercase mt-0.5">
+          <p className="text-[#6A6050] text-[9px] tracking-[0.2em] uppercase mt-0.5">
             {listing.location}
           </p>
         )}
@@ -209,7 +209,7 @@ function ExperienceCard({ listing, index }: { listing: DBListing; index: number 
 function SearchIcon() {
   return (
     <svg
-      className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3A3028]"
+      className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6A6050]"
       width="15" height="15" viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
     >

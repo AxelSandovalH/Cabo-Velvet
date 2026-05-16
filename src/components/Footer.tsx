@@ -33,7 +33,7 @@ export default function Footer() {
                 Los Cabos · BCS · México
               </p>
             </div>
-            <p className="text-[#4A4038] text-sm leading-relaxed font-light max-w-sm mb-8">
+            <p className="text-[#7A7060] text-sm leading-relaxed font-light max-w-sm mb-8">
               Directorio de lujo en Los Cabos. Tours, yates, villas y experiencias curadas — todo gestionado por WhatsApp.
             </p>
             <a
@@ -57,7 +57,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <a
                     href={link.anchor}
-                    className="text-[#4A4038] text-sm font-light hover:text-[#9A9080] transition-colors duration-200"
+                    className="text-[#7A7060] text-sm font-light hover:text-[#9A9080] transition-colors duration-200"
                   >
                     {link.label}
                   </a>
@@ -68,7 +68,7 @@ export default function Footer() {
                   href={WHATSAPP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#4A4038] text-sm font-light hover:text-[#9A9080] transition-colors duration-200"
+                  className="text-[#7A7060] text-sm font-light hover:text-[#9A9080] transition-colors duration-200"
                 >
                   WhatsApp
                 </a>
@@ -81,10 +81,10 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-[#2A2218] text-[10px] tracking-[0.15em] uppercase">
+          <p className="text-[#5A5040] text-[10px] tracking-[0.15em] uppercase">
             © {year} Cabo Rico. All rights reserved.
           </p>
-          <span className="text-[#2A2218] text-[10px] tracking-[0.15em] uppercase">
+          <span className="text-[#5A5040] text-[10px] tracking-[0.15em] uppercase">
             caboricotours.com
           </span>
         </div>

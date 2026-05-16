@@ -61,7 +61,7 @@ export default function YachtsSection({ listings }: { listings?: DBListing[] }) 
             href={WA_YACHTS}
             target="_blank"
             rel="noopener noreferrer"
-            className="self-start text-[9px] tracking-[0.28em] text-[#3A3028] uppercase hover:text-[#C4A45A] transition-colors duration-300 pb-0.5"
+            className="self-start text-[9px] tracking-[0.28em] text-[#6A6050] uppercase hover:text-[#C4A45A] transition-colors duration-300 pb-0.5"
           >
             Consultar disponibilidad →
           </motion.a>
@@ -118,7 +118,7 @@ function YachtCard({ card, index }: { card: Card; index: number }) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/95 via-[#080808]/15 to-transparent" />
           <div className="absolute top-5 left-5">
-            <span className="text-[8px] tracking-[0.35em] text-[#C4A45A]/60 uppercase">{card.detail}</span>
+            <span className="text-[8px] tracking-[0.35em] text-[#C4A45A]/90 uppercase">{card.detail}</span>
           </div>
           <div className="absolute bottom-0 left-0 right-0 px-6 pb-7">
             <p
@@ -127,7 +127,7 @@ function YachtCard({ card, index }: { card: Card; index: number }) {
             >
               {card.name}
             </p>
-            <p className="text-[#7A7060] text-[10px] tracking-[0.2em] uppercase font-light">{card.tagline}</p>
+            <p className="text-[#9A9080] text-[10px] tracking-[0.2em] uppercase font-light">{card.tagline}</p>
           </div>
         </div>
       </Link>
@@ -139,7 +139,7 @@ function ComingSoon({ waUrl, label }: { waUrl: string; label: string }) {
   return (
     <div className="px-6 md:px-14 lg:px-20 pb-20 md:pb-28">
       <div className="border border-white/[0.06] py-16 flex flex-col items-center gap-5 text-center">
-        <span className="text-[9px] tracking-[0.35em] text-[#3A3028] uppercase">Próximamente</span>
+        <span className="text-[9px] tracking-[0.35em] text-[#6A6050] uppercase">Próximamente</span>
         <p className="font-display font-light text-[#4A4038] text-2xl" style={{ fontFamily: "var(--font-cormorant)" }}>
           Catálogo de {label} en camino
         </p>

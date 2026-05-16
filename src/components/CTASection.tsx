@@ -59,7 +59,7 @@ export default function CTASection() {
             initial={{ opacity: 0, y: 16 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.25 }}
-            className="text-[#7A7060] text-sm md:text-base leading-relaxed mb-10 font-light"
+            className="text-[#A09080] text-sm md:text-base leading-relaxed mb-10 font-light"
           >
             Tell us your dates, your group, and your vision.
             <br />
@@ -88,7 +88,7 @@ export default function CTASection() {
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="mt-10 flex items-center justify-center gap-6 text-[9px] tracking-[0.2em] text-[#3A3028] uppercase"
+            className="mt-10 flex items-center justify-center gap-6 text-[9px] tracking-[0.2em] text-[#6A6050] uppercase"
           >
             <span>No booking fees</span>
             <span className="text-[#C4A45A]">·</span>

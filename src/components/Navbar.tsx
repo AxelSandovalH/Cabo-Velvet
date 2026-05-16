@@ -101,7 +101,7 @@ export default function Navbar() {
                 </div>
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="p-2 text-[#4A4038] hover:text-[#F2EDE4] transition-colors"
+                  className="p-2 text-[#8A8070] hover:text-[#F2EDE4] transition-colors"
                   aria-label="Close"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
@@ -136,7 +136,7 @@ export default function Navbar() {
                       >
                         {item.label}
                       </p>
-                      <p className="text-[9px] tracking-[0.22em] text-[#3A3028] uppercase mt-0.5">
+                      <p className="text-[9px] tracking-[0.22em] text-[#6A6050] uppercase mt-0.5">
                         {item.sub}
                       </p>
                     </div>
@@ -161,7 +161,7 @@ export default function Navbar() {
                   <WhatsAppIcon />
                   Book Your Experience
                 </motion.a>
-                <p className="text-[9px] tracking-[0.2em] text-[#2A2018] uppercase text-center mt-4">
+                <p className="text-[9px] tracking-[0.2em] text-[#5A5040] uppercase text-center mt-4">
                   Los Cabos · BCS · México
                 </p>
               </div>
