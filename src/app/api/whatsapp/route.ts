@@ -49,10 +49,7 @@ export async function POST(req: NextRequest) {
     const messageText = String(data.body ?? '').trim()
     if (!messageText) return NextResponse.json({ status: 'ok' })
 
-    console.log('[concierge] incoming phone:', phone, '| allowed:', isAllowed(phone), '| allowlist:', ALLOWED_PHONES)
-
     if (!isAllowed(phone)) {
-      console.log('[concierge] blocked:', phone)
       return NextResponse.json({ status: 'ok' })
     }
 
@@ -86,9 +83,7 @@ export async function POST(req: NextRequest) {
 
     // Pass history WITHOUT the last user message (agent appends it internally)
     const historyWithoutLast = history.slice(0, -1)
-    console.log('[concierge] calling agent, history length:', historyWithoutLast.length)
     const { reply } = await runConcierge(historyWithoutLast, messageText, phone, lead)
-    console.log('[concierge] agent reply length:', reply.length, '| preview:', reply.slice(0, 60))
 
     if (!reply) return NextResponse.json({ status: 'ok' })
 
@@ -99,9 +94,7 @@ export async function POST(req: NextRequest) {
       .update({ updated_at: new Date().toISOString() })
       .eq('phone', phone)
 
-    console.log('[concierge] sending WhatsApp to:', fromRaw)
     await sendWhatsApp(fromRaw, reply)
-    console.log('[concierge] sent ok →', phone, reply.slice(0, 80))
 
   } catch (err) {
     console.error('[concierge error]', phone, err)
