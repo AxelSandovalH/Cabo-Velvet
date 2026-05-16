@@ -3,7 +3,6 @@ import { supabase } from '@/lib/supabase'
 import { runConcierge, Message, LeadContext } from '@/lib/concierge/agent'
 import { sendWhatsApp } from '@/lib/concierge/ultramsg'
 
-// Only these numbers can chat with the concierge (allowlist)
 const ALLOWED_PHONES = (process.env.ALLOWED_WA_PHONES ?? '')
   .split(',').map((p) => p.trim().replace(/\D/g, '')).filter(Boolean)
 
@@ -23,7 +22,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const data = body.data ?? body
 
-    // Ignore non-chat, own messages, and group chats
     if (data.type !== 'chat') return NextResponse.json({ status: 'ok' })
     if (data.fromMe) return NextResponse.json({ status: 'ok' })
     if (String(data.from ?? '').includes('@g.us')) return NextResponse.json({ status: 'ok' })
@@ -33,29 +31,27 @@ export async function POST(req: NextRequest) {
     const messageText = String(data.body ?? '').trim()
     if (!messageText) return NextResponse.json({ status: 'ok' })
 
-    // Allowlist check
     if (!isAllowed(phone)) {
-      console.log('[concierge] blocked phone:', phone)
+      console.log('[concierge] blocked:', phone)
       return NextResponse.json({ status: 'ok' })
     }
 
-    // Load or create conversation
+    // Load conversation (upsert guarantees row exists)
     const { data: conv } = await supabase
       .from('conversations')
       .select('messages, name, group_size, travel_date, budget_range, interests')
       .eq('phone', phone)
-      .single()
+      .maybeSingle()
 
     const history: Message[] = Array.isArray(conv?.messages) ? conv.messages : []
 
-    // Ensure conversation row exists
-    if (!conv) {
-      await supabase.from('conversations').insert({
-        phone,
-        messages: [],
-        lead_status: 'new',
-      })
-    }
+    // Append user message immediately so concurrent calls see it
+    const historyWithUser: Message[] = [...history, { role: 'user' as const, content: messageText }]
+
+    await supabase.from('conversations').upsert(
+      { phone, messages: historyWithUser, lead_status: conv ? undefined : 'new', updated_at: new Date().toISOString() },
+      { onConflict: 'phone', ignoreDuplicates: false }
+    )
 
     const lead: LeadContext = {
       name: conv?.name,
@@ -65,24 +61,21 @@ export async function POST(req: NextRequest) {
       interests: conv?.interests,
     }
 
-    // Run concierge agent
+    // Run agent with full history (already includes the new user message)
     const { reply, updatedHistory } = await runConcierge(history, messageText, phone, lead)
 
-    // Persist updated history
+    // Save final history with assistant reply
     await supabase
       .from('conversations')
       .update({ messages: updatedHistory, updated_at: new Date().toISOString() })
       .eq('phone', phone)
 
-    // Send reply via WhatsApp
     await sendWhatsApp(fromRaw, reply)
+    console.log('[concierge] →', phone, reply.slice(0, 80))
 
-    console.log('[concierge] replied to', phone, '→', reply.slice(0, 60))
   } catch (err) {
     console.error('[concierge error]', phone, err)
-    // Don't send error message to user — just log
   }
 
-  // Always 200 to prevent UltraMsg retries
   return NextResponse.json({ status: 'ok' })
 }
