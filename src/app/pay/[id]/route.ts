@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const db = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { supabase } from '@/lib/supabase'
 
 export async function GET(
   _req: NextRequest,
@@ -12,7 +7,7 @@ export async function GET(
 ) {
   const { id } = await params
 
-  const { data } = await db
+  const { data } = await supabase
     .from('bookings')
     .select('stripe_url')
     .eq('short_id', id)
