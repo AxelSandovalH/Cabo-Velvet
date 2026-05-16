@@ -66,11 +66,11 @@ export async function runConcierge(
   }
   if (!reply) reply = 'Un momento, estoy revisando las opciones para ti. 🙏'
 
-  const updatedHistory: Message[] = [
+  const updatedHistory: Message[] = ([
     ...trimmedHistory,
-    { role: 'user', content: userMessage },
-    { role: 'assistant', content: reply },
-  ].slice(-MAX_HISTORY)
+    { role: 'user' as const, content: userMessage },
+    { role: 'assistant' as const, content: reply },
+  ] as Message[]).slice(-MAX_HISTORY)
 
   return { reply, updatedHistory }
 }
