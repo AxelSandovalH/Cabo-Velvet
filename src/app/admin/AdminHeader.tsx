@@ -3,6 +3,7 @@
 const PAGES = [
   { key: 'dashboard', label: 'Imágenes', href: '/admin/dashboard' },
   { key: 'listings', label: 'Actividades', href: '/admin/listings' },
+  { key: 'referrers', label: 'Referidos', href: '/admin/referrers' },
   { key: 'concierge', label: 'Concierge', href: '/admin/concierge' },
 ] as const
 
@@ -11,6 +12,7 @@ type Page = (typeof PAGES)[number]['key']
 const PAGE_TITLES: Record<Page, string> = {
   dashboard: 'Imágenes',
   listings: 'Actividades',
+  referrers: 'Referidos',
   concierge: 'Concierge AI',
 }
 

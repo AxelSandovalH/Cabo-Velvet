@@ -130,6 +130,7 @@ export default function BookingWidget({ listingId, price, priceUnit }: Props) {
     setBooking(true)
     setError('')
     try {
+      const referrerCode = typeof window !== 'undefined' ? (localStorage.getItem('cr_ref') ?? undefined) : undefined
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -139,6 +140,7 @@ export default function BookingWidget({ listingId, price, priceUnit }: Props) {
           peopleCount: people,
           guestName: guestName || undefined,
           guestPhone: guestPhone || undefined,
+          referrerCode,
         }),
       })
       const json = await res.json()

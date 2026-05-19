@@ -5,7 +5,7 @@ import { checkAvailability } from '@/lib/availability'
 
 export async function POST(req: NextRequest) {
   try {
-    const { listingId, bookingDate, peopleCount = 1, guestName, guestPhone } = await req.json()
+    const { listingId, bookingDate, peopleCount = 1, guestName, guestPhone, referrerCode } = await req.json()
 
     if (!listingId) {
       return NextResponse.json({ error: 'listingId required' }, { status: 400 })
@@ -82,6 +82,7 @@ export async function POST(req: NextRequest) {
       amount: Math.round(listing.price * 100) * qty,
       booking_date: bookingDate ?? null,
       people_count: qty,
+      referrer_code: referrerCode ?? null,
     })
 
     return NextResponse.json({ url: session.url })

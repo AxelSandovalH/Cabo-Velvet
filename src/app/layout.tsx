@@ -4,6 +4,8 @@ import { Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import ChatWidget from "@/components/ChatWidget";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { Suspense } from "react";
+import RefCapture from "@/components/RefCapture";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -69,6 +71,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col antialiased bg-[#080808] text-[#F2EDE4] overflow-x-hidden">
         <LanguageProvider>
+          <Suspense fallback={null}>
+            <RefCapture />
+          </Suspense>
           {children}
           <ChatWidget />
         </LanguageProvider>

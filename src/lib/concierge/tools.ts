@@ -49,6 +49,17 @@ export const tools: Anthropic.Tool[] = [
     },
   },
   {
+    name: 'get_referrer_stats',
+    description: 'Look up referral stats for someone who is a registered referrer (bartender, waiter, uber driver, etc). Use when someone asks about their commissions, bookings they referred, or their performance. Look them up by their phone number.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        phone: { type: 'string', description: 'The phone number of the person asking (from the system prompt)' },
+      },
+      required: ['phone'],
+    },
+  },
+  {
     name: 'save_lead_info',
     description: 'Save or update lead information captured during the conversation.',
     input_schema: {
@@ -177,6 +188,46 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
 
         const total = listing.price * quantity
         return JSON.stringify({ payment_url: session.url, listing_name: listing.name, price_per_person: listing.price, quantity, total })
+      }
+
+      case 'get_referrer_stats': {
+        const { phone } = input as { phone: string }
+        const clean = phone.replace(/\D/g, '')
+
+        const { data: referrer } = await supabase
+          .from('referrers')
+          .select('id, name, code, commission_pct, active')
+          .or(`phone.eq.${clean},phone.eq.+${clean}`)
+          .single()
+
+        if (!referrer) {
+          return JSON.stringify({ error: 'not_a_referrer', message: 'This phone number is not registered as a referrer' })
+        }
+
+        if (!referrer.active) {
+          return JSON.stringify({ error: 'inactive', message: 'This referrer account is inactive' })
+        }
+
+        const { data: bookings } = await supabase
+          .from('bookings')
+          .select('amount, status, created_at')
+          .eq('referrer_code', referrer.code)
+          .in('status', ['link_sent', 'confirmed', 'completed'])
+
+        const total = bookings?.length ?? 0
+        const confirmed = bookings?.filter(b => ['confirmed', 'completed'].includes(b.status)).length ?? 0
+        const revenue = (bookings ?? []).reduce((s, b) => s + (b.amount ?? 0), 0)
+        const commission = (revenue / 100) * (referrer.commission_pct / 100)
+
+        return JSON.stringify({
+          name: referrer.name,
+          code: referrer.code,
+          commission_pct: referrer.commission_pct,
+          total_referrals: total,
+          confirmed_bookings: confirmed,
+          total_revenue_usd: revenue / 100,
+          commission_earned_usd: commission,
+        })
       }
 
       case 'save_lead_info': {
