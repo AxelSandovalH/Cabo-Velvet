@@ -152,7 +152,7 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
           session = await getStripe().checkout.sessions.create({
             mode: 'payment',
             payment_method_types: ['card'],
-            expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7 days
+
             line_items: [{
               quantity,
               price_data: {
