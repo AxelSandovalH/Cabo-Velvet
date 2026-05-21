@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
     const session = await getStripe().checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
+      expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7 days
       line_items: [{
         quantity: qty,
         price_data: {
