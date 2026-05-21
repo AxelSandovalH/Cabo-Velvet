@@ -75,7 +75,7 @@ export default function RootLayout({
             <RefCapture />
           </Suspense>
           {children}
-          <ChatWidget />
+          {/* <ChatWidget /> */}
         </LanguageProvider>
       </body>
     </html>
