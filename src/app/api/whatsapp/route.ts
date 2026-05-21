@@ -14,7 +14,7 @@ function normalizePhone(raw: string): string {
 }
 
 function isAllowed(phone: string): boolean {
-  if (!ALLOWED_PHONES.length) return false
+  if (!ALLOWED_PHONES.length) return true // open mode — allow all when env var not set
   const normalizedAllowed = ALLOWED_PHONES.map((p) => (p.length > 10 ? p.slice(-10) : p))
   return normalizedAllowed.includes(phone)
 }
