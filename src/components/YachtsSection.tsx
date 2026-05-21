@@ -32,9 +32,12 @@ export default function YachtsSection({ listings }: { listings?: DBListing[] }) 
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tx.yachts.waMessage)}`;
 
   return (
-    <section id="yachts" className="bg-[#080808]">
-      <div className="border-t border-white/[0.04]" />
-      <div className="pt-24 md:pt-32">
+    <section id="yachts" className="bg-[#0A0806] relative">
+      {/* Gold hairline divider */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#C4A45A]/25 to-transparent" />
+      <div className="pt-24 md:pt-32 relative">
+        {/* Warm glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-48 bg-[#C4A45A]/[0.04] blur-[80px] rounded-full pointer-events-none" />
         <div
           ref={headerRef}
           className="px-6 md:px-14 lg:px-20 mb-10 md:mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4"
@@ -75,7 +78,7 @@ export default function YachtsSection({ listings }: { listings?: DBListing[] }) 
         {cards.length > 0 ? (
           <>
             <div className="relative">
-              <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 bg-gradient-to-l from-[#080808] to-transparent pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 bg-gradient-to-l from-[#0A0806] to-transparent pointer-events-none" />
               <div
                 className="flex gap-3 md:gap-4 overflow-x-auto pb-10 md:pb-12 px-6 md:px-14 lg:px-20"
                 style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
@@ -121,7 +124,7 @@ function YachtCard({ card, index }: { card: Card; index: number }) {
             className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
             sizes="(max-width: 768px) 85vw, 400px"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/95 via-[#080808]/15 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0806]/95 via-[#080808]/15 to-transparent" />
           <div className="absolute top-5 left-5">
             <span className="text-[8px] tracking-[0.35em] text-[#C4A45A]/90 uppercase">{card.detail}</span>
           </div>

@@ -66,11 +66,14 @@ export default function ExperiencesSection({ listings }: { listings?: DBListing[
   const resultLabel = resultCount === 1 ? tx.experiences.experience : tx.experiences.experiences
 
   return (
-    <section id="experiences" className="bg-[#080808]">
-      <div className="border-t border-white/[0.04]" />
+    <section id="experiences" className="bg-[#0A0806] relative">
+      {/* Gold hairline divider */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#C4A45A]/25 to-transparent" />
 
       {/* Header */}
-      <div ref={headerRef} className="px-6 md:px-12 lg:px-16 max-w-7xl mx-auto pt-24 md:pt-32 pb-10">
+      <div ref={headerRef} className="px-6 md:px-12 lg:px-16 max-w-7xl mx-auto pt-24 md:pt-32 pb-10 relative">
+        {/* Warm glow behind heading */}
+        <div className="absolute top-0 left-0 w-[600px] h-64 bg-[#C4A45A]/[0.04] blur-[80px] rounded-full pointer-events-none" />
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -178,9 +181,9 @@ function ExperienceCard({ listing, index }: { listing: DBListing; index: number 
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: Math.min(index % 8, 7) * 0.06, ease: [0.16, 1, 0.3, 1] }}
     >
-      <Link href={`/listing/${listing.id}`} className="group block">
+      <Link href={`/listing/${listing.id}`} className="group block bg-[#100D09] border border-white/[0.08] hover:border-[#C4A45A]/25 transition-colors duration-300 overflow-hidden">
         {/* Image */}
-        <div className="relative overflow-hidden aspect-[4/3] mb-3">
+        <div className="relative overflow-hidden aspect-[4/3]">
           <Image
             src={img}
             alt={listing.name}
@@ -188,26 +191,28 @@ function ExperienceCard({ listing, index }: { listing: DBListing; index: number 
             className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/70 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0806]/80 via-transparent to-transparent" />
           {price && (
-            <span className="absolute bottom-2 right-2 text-[10px] tracking-wide text-[#F2EDE4] bg-[#080808]/70 px-2 py-0.5">
+            <span className="absolute bottom-2 right-2 text-[10px] tracking-wide text-[#F2EDE4] bg-[#0A0806]/80 px-2 py-0.5 border border-white/10">
               {price}
             </span>
           )}
         </div>
 
         {/* Text */}
-        <p
-          className="text-[#F2EDE4] font-light leading-snug group-hover:text-[#C4A45A] transition-colors duration-300 line-clamp-2"
-          style={{ fontFamily: "var(--font-cormorant)", fontSize: "clamp(0.95rem, 2.5vw, 1.1rem)" }}
-        >
-          {listing.name}
-        </p>
-        {listing.location && (
-          <p className="text-[#6A6050] text-[9px] tracking-[0.2em] uppercase mt-0.5">
-            {listing.location}
+        <div className="px-3 py-3">
+          <p
+            className="text-[#F2EDE4] font-light leading-snug group-hover:text-[#C4A45A] transition-colors duration-300 line-clamp-2"
+            style={{ fontFamily: "var(--font-cormorant)", fontSize: "clamp(0.95rem, 2.5vw, 1.1rem)" }}
+          >
+            {listing.name}
           </p>
-        )}
+          {listing.location && (
+            <p className="text-[#5A5040] text-[9px] tracking-[0.2em] uppercase mt-0.5">
+              {listing.location}
+            </p>
+          )}
+        </div>
       </Link>
     </motion.div>
   )

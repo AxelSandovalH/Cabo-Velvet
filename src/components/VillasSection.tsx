@@ -27,11 +27,16 @@ export default function VillasSection({ listings }: { listings?: DBListing[] }) 
   const cards = listings?.length ? fromDB(listings) : [];
 
   return (
-    <section id="villas" className="pt-24 md:pt-32 pb-0 bg-[#060606]">
+    <section id="villas" className="pt-0 pb-0 bg-[#0E0B07] relative">
+      {/* Gold hairline divider */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#C4A45A]/25 to-transparent" />
+      <div className="pt-24 md:pt-32">
       <div
         ref={headerRef}
-        className="px-6 md:px-14 lg:px-20 mb-10 md:mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4"
+        className="px-6 md:px-14 lg:px-20 mb-10 md:mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4 relative"
       >
+        {/* Warm glow */}
+        <div className="absolute top-0 right-0 w-[500px] h-64 bg-[#C4A45A]/[0.04] blur-[80px] rounded-full pointer-events-none" />
         <div>
           <motion.div
             initial={{ opacity: 0, x: -10 }}
@@ -68,7 +73,7 @@ export default function VillasSection({ listings }: { listings?: DBListing[] }) 
       {cards.length > 0 ? (
         <>
           <div className="relative">
-            <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 bg-gradient-to-l from-[#060606] to-transparent pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 bg-gradient-to-l from-[#0E0B07] to-transparent pointer-events-none" />
             <div
               className="flex gap-3 md:gap-4 overflow-x-auto pb-10 md:pb-12 px-6 md:px-14 lg:px-20"
               style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
@@ -88,6 +93,7 @@ export default function VillasSection({ listings }: { listings?: DBListing[] }) 
       ) : (
         <ComingSoon waUrl={WA_VILLAS} label="villas" />
       )}
+      </div>
     </section>
   );
 }
@@ -113,7 +119,7 @@ function VillaCard({ card, index }: { card: Card; index: number }) {
             className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
             sizes="(max-width: 768px) 85vw, 420px"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#060606]/95 via-[#060606]/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0E0B07]/95 via-[#0E0B07]/15 to-transparent" />
           <div className="absolute top-5 left-5">
             <span className="text-[8px] tracking-[0.35em] text-[#C4A45A]/70 uppercase">{card.location}</span>
           </div>
