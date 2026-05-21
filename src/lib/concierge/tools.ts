@@ -145,7 +145,7 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
         if (error || !listing) return JSON.stringify({ error: 'Listing not found — search again and use the correct id' })
         if (!listing.price) return JSON.stringify({ error: 'This listing has no price — tell user to contact via WhatsApp' })
 
-        const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? '').replace(/\/$/, '') || 'https://cabo-velvet.vercel.app'
+        const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? '').trim().replace(/\/+$/, '') || 'https://www.caboricotours.com'
 
         let session
         try {

@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     }
 
     const qty = Math.max(1, Math.round(peopleCount))
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? '').trim().replace(/\/+$/, '') || 'https://www.caboricotours.com'
 
     const session = await getStripe().checkout.sessions.create({
       mode: 'payment',

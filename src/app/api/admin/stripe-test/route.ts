@@ -7,7 +7,7 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? '').replace(/\/$/, '') || 'https://cabo-velvet.vercel.app'
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? '').trim().replace(/\/+$/, '') || 'https://www.caboricotours.com'
   const keySnippet = process.env.STRIPE_SECRET_KEY
     ? process.env.STRIPE_SECRET_KEY.slice(0, 12) + '...'
     : 'NOT SET'
