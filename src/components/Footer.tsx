@@ -87,9 +87,14 @@ export default function Footer() {
           <p className="text-[#5A5040] text-[10px] tracking-[0.15em] uppercase">
             © {year} Cabo Rico. {tx.footer.rights}
           </p>
-          <span className="text-[#5A5040] text-[10px] tracking-[0.15em] uppercase">
-            caboricotours.com
-          </span>
+          <a
+            href="https://axelsandoval.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#5A5040] text-[10px] tracking-[0.15em] uppercase hover:text-[#C4A45A] transition-colors duration-300"
+          >
+            Design &amp; Dev · axelsandoval.dev
+          </a>
         </div>
       </div>
     </footer>
