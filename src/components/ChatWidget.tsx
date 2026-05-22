@@ -38,14 +38,15 @@ export default function ChatWidget() {
   const tx = t[lang]
   const [messages, setMessages] = useState<Message[]>([lang === 'es' ? GREETING_ES : GREETING_EN])
 
-  useEffect(() => {
-    setSessionId(getSessionId())
-  }, [])
+  useEffect(() => { setSessionId(getSessionId()) }, [])
 
   useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 300)
+    if (open) setTimeout(() => inputRef.current?.focus(), 300)
+    // Lock body scroll on mobile when open
+    if (typeof window !== 'undefined') {
+      document.body.style.overflow = open ? 'hidden' : ''
     }
+    return () => { document.body.style.overflow = '' }
   }, [open])
 
   useEffect(() => {
@@ -89,19 +90,23 @@ export default function ChatWidget() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.96 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-24 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[380px] flex flex-col"
-            style={{ height: 'min(560px, calc(100dvh - 120px))' }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            // Mobile: full screen overlay. sm+: positioned floating panel
+            className="fixed z-[70] flex flex-col inset-0 sm:inset-auto sm:bottom-24 sm:right-6 sm:w-[380px] sm:rounded-2xl"
+            style={{ height: undefined }}
           >
             {/* Glass panel */}
-            <div className="flex flex-col h-full rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl"
-              style={{ background: 'rgba(8,8,8,0.97)', backdropFilter: 'blur(20px)' }}
+            <div
+              className="flex flex-col h-full sm:rounded-2xl sm:h-[min(560px,calc(100dvh-120px))] overflow-hidden border-0 sm:border sm:border-white/[0.08] sm:shadow-2xl"
+              style={{ background: 'rgba(8,8,8,0.99)', backdropFilter: 'blur(20px)' }}
             >
               {/* Header */}
-              <div className="flex-shrink-0 px-5 py-4 border-b border-white/[0.06] flex items-center justify-between">
+              <div className="flex-shrink-0 px-4 sm:px-5 py-4 border-b border-white/[0.06] flex items-center justify-between"
+                style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
+              >
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <div className="w-8 h-8 rounded-full bg-[#C4A45A]/15 flex items-center justify-center">
@@ -116,9 +121,10 @@ export default function ChatWidget() {
                 </div>
                 <button
                   onClick={() => setOpen(false)}
-                  className="text-white/30 hover:text-white/70 transition-colors p-1"
+                  className="text-white/30 hover:text-white/70 transition-colors p-2 -mr-1"
+                  aria-label="Cerrar"
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
                   </svg>
                 </button>
@@ -144,7 +150,6 @@ export default function ChatWidget() {
                   </motion.div>
                 ))}
 
-                {/* Typing indicator */}
                 {loading && (
                   <motion.div
                     initial={{ opacity: 0, y: 8 }}
@@ -167,7 +172,10 @@ export default function ChatWidget() {
               </div>
 
               {/* Input */}
-              <div className="flex-shrink-0 px-3 py-3 border-t border-white/[0.06]">
+              <div
+                className="flex-shrink-0 px-3 py-3 border-t border-white/[0.06]"
+                style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+              >
                 <div className="flex items-end gap-2 bg-white/[0.05] rounded-xl px-3 py-2">
                   <textarea
                     ref={inputRef}
@@ -183,9 +191,9 @@ export default function ChatWidget() {
                   <button
                     onClick={send}
                     disabled={!input.trim() || loading}
-                    className="flex-shrink-0 w-7 h-7 rounded-lg bg-[#C4A45A] disabled:opacity-30 flex items-center justify-center transition-opacity duration-200 mb-0.5"
+                    className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#C4A45A] disabled:opacity-30 flex items-center justify-center transition-opacity duration-200 mb-0.5"
                   >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#080808" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#080808" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   </button>
@@ -197,12 +205,15 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* Floating button */}
+      {/* Floating button — hidden on mobile when chat is open (full screen) */}
       <motion.button
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-full bg-[#C4A45A] shadow-lg shadow-[#C4A45A]/25 flex items-center justify-center"
+        className={`fixed z-50 w-14 h-14 rounded-full bg-[#C4A45A] shadow-lg shadow-[#C4A45A]/25 flex items-center justify-center
+          bottom-[72px] right-4 sm:bottom-6 sm:right-6
+          ${open ? 'hidden sm:flex' : 'flex'}
+        `}
       >
         <AnimatePresence mode="wait">
           {open ? (
@@ -230,7 +241,6 @@ export default function ChatWidget() {
           )}
         </AnimatePresence>
 
-        {/* Pulse ring */}
         {!open && (
           <motion.span
             className="absolute inset-0 rounded-full border-2 border-[#C4A45A]"

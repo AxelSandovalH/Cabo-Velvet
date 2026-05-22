@@ -1,51 +1,66 @@
 'use client'
 
-const PAGES = [
-  { key: 'dashboard', label: 'Imágenes', href: '/admin/dashboard' },
-  { key: 'listings', label: 'Actividades', href: '/admin/listings' },
-  { key: 'referrers', label: 'Referidos', href: '/admin/referrers' },
-  { key: 'concierge', label: 'Concierge', href: '/admin/concierge' },
+export const ADMIN_TABS = [
+  { key: 'dashboard', label: 'Imágenes' },
+  { key: 'listings',  label: 'Actividades' },
+  { key: 'referrers', label: 'Referidos' },
+  { key: 'concierge', label: 'Concierge' },
 ] as const
 
-type Page = (typeof PAGES)[number]['key']
+export type AdminTab = (typeof ADMIN_TABS)[number]['key']
 
-const PAGE_TITLES: Record<Page, string> = {
+const TAB_TITLES: Record<AdminTab, string> = {
   dashboard: 'Imágenes',
-  listings: 'Actividades',
+  listings:  'Actividades',
   referrers: 'Referidos',
   concierge: 'Concierge AI',
 }
 
-export default function AdminHeader({ current }: { current: Page }) {
+export default function AdminHeader({
+  current,
+  onTabChange,
+}: {
+  current: AdminTab
+  onTabChange?: (tab: AdminTab) => void
+}) {
   return (
-    <header className="flex-shrink-0 border-b border-white/[0.07] bg-[#080808] px-6 py-4 flex items-center justify-between gap-6">
-      {/* Left: wordmark + nav */}
-      <div className="flex items-center gap-5 min-w-0">
-        <div className="flex items-center gap-2">
+    <header className="flex-shrink-0 border-b border-white/[0.07] bg-[#080808] px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+      {/* Left: wordmark + tabs */}
+      <div className="flex items-center gap-4 min-w-0 overflow-hidden">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-[#C4A45A] text-sm font-semibold tracking-widest uppercase">CR</span>
-          <span className="text-white/20 text-sm">·</span>
-          <span className="text-white/60 text-sm font-medium tracking-wide">{PAGE_TITLES[current]}</span>
+          <span className="text-white/20 text-sm hidden sm:block">·</span>
+          <span className="text-white/60 text-sm font-medium tracking-wide hidden sm:block">{TAB_TITLES[current]}</span>
         </div>
 
-        <nav className="hidden sm:flex items-center gap-0.5">
-          {PAGES.map(({ key, label, href }) =>
-            current === key ? (
-              <span
+        <nav className="flex items-center gap-0.5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          {ADMIN_TABS.map(({ key, label }) => {
+            const isActive = current === key
+            if (isActive) {
+              return (
+                <span key={key} className="flex-shrink-0 text-[11px] px-3 py-1.5 rounded-lg bg-[#C4A45A]/10 text-[#C4A45A] font-medium tracking-wide whitespace-nowrap">
+                  {label}
+                </span>
+              )
+            }
+            return onTabChange ? (
+              <button
                 key={key}
-                className="text-[11px] px-3 py-1.5 rounded-lg bg-[#C4A45A]/10 text-[#C4A45A] font-medium tracking-wide"
+                onClick={() => onTabChange(key)}
+                className="flex-shrink-0 text-[11px] px-3 py-1.5 rounded-lg text-white/35 hover:text-white/65 hover:bg-white/[0.04] transition-colors tracking-wide whitespace-nowrap"
               >
                 {label}
-              </span>
+              </button>
             ) : (
               <a
                 key={key}
-                href={href}
-                className="text-[11px] px-3 py-1.5 rounded-lg text-white/35 hover:text-white/65 hover:bg-white/[0.04] transition-colors tracking-wide"
+                href={`/admin/${key === 'dashboard' ? 'dashboard' : key}`}
+                className="flex-shrink-0 text-[11px] px-3 py-1.5 rounded-lg text-white/35 hover:text-white/65 hover:bg-white/[0.04] transition-colors tracking-wide whitespace-nowrap"
               >
                 {label}
               </a>
             )
-          )}
+          })}
         </nav>
       </div>
 

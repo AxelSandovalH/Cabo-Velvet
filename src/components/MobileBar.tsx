@@ -25,7 +25,7 @@ export default function MobileBar() {
         initial={{ y: 80 }}
         animate={{ y: visible ? 0 : 80 }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
+        className="fixed bottom-0 left-0 right-0 z-40 md:hidden"
       >
         <a
           href={waUrl}
