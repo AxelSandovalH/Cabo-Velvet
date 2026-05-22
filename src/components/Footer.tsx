@@ -5,12 +5,14 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { t } from "@/lib/i18n/translations";
 
 const WHATSAPP_NUMBER = "523141222146";
+const HUMAN_WHATSAPP = "5216242409228";
 
 export default function Footer() {
   const year = new Date().getFullYear();
   const { lang } = useLanguage();
   const tx = t[lang];
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(tx.footer.waMessage)}`;
+  const humanWaUrl = `https://wa.me/${HUMAN_WHATSAPP}?text=${encodeURIComponent(tx.footer.contact_human_message)}`;
 
   const navLinks = [
     { label: tx.nav.experiences, anchor: "#experiences" },
@@ -39,15 +41,26 @@ export default function Footer() {
             <p className="text-[#7A7060] text-sm leading-relaxed font-light max-w-sm mb-8">
               {tx.footer.description}
             </p>
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 text-[#C4A45A] text-[10px] tracking-[0.2em] uppercase hover:gap-4 transition-all duration-300"
-            >
-              <WhatsAppIcon />
-              <span>{tx.footer.contact}</span>
-            </a>
+            <div className="flex flex-col gap-3">
+              <a
+                href={waUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 text-[#C4A45A] text-[10px] tracking-[0.2em] uppercase hover:gap-4 transition-all duration-300"
+              >
+                <WhatsAppIcon />
+                <span>{tx.footer.contact}</span>
+              </a>
+              <a
+                href={humanWaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 text-[#7A7060] text-[10px] tracking-[0.2em] uppercase hover:text-[#9A9080] hover:gap-4 transition-all duration-300"
+              >
+                <WhatsAppIcon />
+                <span>{tx.footer.contact_human}</span>
+              </a>
+            </div>
           </div>
 
           {/* Nav */}
