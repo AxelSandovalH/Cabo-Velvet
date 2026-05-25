@@ -11,14 +11,23 @@ import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
 import { fetchListingsByCategory } from "@/lib/listings";
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
+
+async function safeFetch(category: Parameters<typeof fetchListingsByCategory>[0]) {
+  try {
+    return await fetchListingsByCategory(category)
+  } catch (e) {
+    console.error('[page] safeFetch failed for', category, e)
+    return []
+  }
+}
 
 export default async function HomePage() {
   const [villas, yachts, experiences, services] = await Promise.all([
-    fetchListingsByCategory('villa'),
-    fetchListingsByCategory('yacht'),
-    fetchListingsByCategory('experience'),
-    fetchListingsByCategory('service'),
+    safeFetch('villa'),
+    safeFetch('yacht'),
+    safeFetch('experience'),
+    safeFetch('service'),
   ])
 
   return (

@@ -32,8 +32,8 @@ export async function fetchListingsByCategory(
     .order('name')
 
   if (error) {
-    console.error(`[fetchListings] ${category}:`, error.message)
-    return []
+    console.error(`[fetchListings] ${category}:`, error.message, error.code)
+    throw new Error(`Failed to fetch ${category} listings: ${error.message}`)
   }
 
   return data ?? []
