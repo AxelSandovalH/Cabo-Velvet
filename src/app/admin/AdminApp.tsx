@@ -6,6 +6,7 @@ import DashboardClient from './dashboard/DashboardClient'
 import ListingsClient from './listings/ListingsClient'
 import ReferrersClient from './referrers/ReferrersClient'
 import ConciergeInner from './concierge/ConciergeInner'
+import ProvidersClient from './providers/ProvidersClient'
 
 type Listing = {
   id: string; name: string; category: string
@@ -39,7 +40,7 @@ type Props = {
 }
 
 export default function AdminApp({ categories, listings, siteUrl, conversations, bookings, stats }: Props) {
-  const [tab, setTab] = useState<AdminTab>('dashboard')
+  const [tab, setTab] = useState<AdminTab>('concierge')
 
   return (
     <div className="h-screen flex flex-col bg-[#080808] text-[#F2EDE4] overflow-hidden">
@@ -51,6 +52,9 @@ export default function AdminApp({ categories, listings, siteUrl, conversations,
         )}
         {tab === 'listings' && (
           <ListingsClient listings={listings} />
+        )}
+        {tab === 'providers' && (
+          <ProvidersClient />
         )}
         {tab === 'referrers' && (
           <ReferrersClient siteUrl={siteUrl} />

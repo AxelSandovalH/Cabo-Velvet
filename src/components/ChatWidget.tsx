@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { t } from '@/lib/i18n/translations'
@@ -27,7 +28,11 @@ const GREETING_ES: Message = {
   content: '¡Hola! Soy el concierge de Cabo Rico.\n\n¿En qué puedo ayudarte hoy? Cuéntame qué tipo de experiencia estás buscando en Los Cabos.',
 }
 
+/** Routes that are not for guests — the concierge bubble has no business there. */
+const HIDDEN_ON = ['/admin', '/reserva']
+
 export default function ChatWidget() {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -83,6 +88,8 @@ export default function ChatWidget() {
       send()
     }
   }
+
+  if (HIDDEN_ON.some((prefix) => pathname?.startsWith(prefix))) return null
 
   return (
     <>

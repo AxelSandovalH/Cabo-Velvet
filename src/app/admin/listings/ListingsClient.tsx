@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import SlotEditor from './SlotEditor'
 
 type Listing = {
   id: string
@@ -49,6 +50,16 @@ type RowState = {
 export default function ListingsClient({ listings }: { listings: Listing[] }) {
   const [search, setSearch] = useState('')
   const [catFilter, setCatFilter] = useState('all')
+  const [expanded, setExpanded] = useState<string | null>(null)
+  const [slotCounts, setSlotCounts] = useState<Record<string, number>>({})
+
+  // Un vistazo de cuántos horarios tiene cada actividad, sin abrirlas una por una
+  useEffect(() => {
+    fetch('/api/admin/slots')
+      .then(r => r.json())
+      .then(d => { if (d?.counts) setSlotCounts(d.counts) })
+      .catch(() => {})
+  }, [])
 
   const [rows, setRows] = useState<Record<string, RowState>>(() => {
     const init: Record<string, RowState> = {}
@@ -170,6 +181,17 @@ export default function ListingsClient({ listings }: { listings: Listing[] }) {
                 </span>
                 <p className="text-sm font-medium text-[#F2EDE4] flex-1 truncate">{listing.name}</p>
 
+                <button
+                  onClick={() => setExpanded(expanded === listing.id ? null : listing.id)}
+                  className={`text-[10px] tracking-[0.15em] uppercase px-2.5 py-1 rounded-full font-medium transition-colors ${
+                    slotCounts[listing.id]
+                      ? 'bg-[#C4A45A]/15 text-[#C4A45A] hover:bg-[#C4A45A]/25'
+                      : 'bg-white/[0.05] text-white/30 hover:text-white/60'
+                  }`}
+                >
+                  {slotCounts[listing.id] ? `${slotCounts[listing.id]} horarios` : 'Sin horarios'}
+                </button>
+
                 {/* Active toggle */}
                 <button
                   onClick={() => update(listing.id, { active: !row.active })}
@@ -211,7 +233,7 @@ export default function ListingsClient({ listings }: { listings: Listing[] }) {
                     onChange={e => update(listing.id, { capacity: e.target.value })}
                     className="w-full bg-white/[0.04] border border-white/[0.08] text-[#F2EDE4] text-sm px-3 py-2 rounded-lg outline-none focus:border-[#C4A45A]/40 transition-colors placeholder-white/15"
                   />
-                  <p className="text-[9px] text-white/20 mt-1">Activa el calendario de reservas</p>
+                  <p className="text-[9px] text-white/20 mt-1">Límite por día, sobre todos los horarios</p>
                 </div>
 
                 {/* Closed weekdays */}
@@ -237,6 +259,18 @@ export default function ListingsClient({ listings }: { listings: Listing[] }) {
                   </div>
                 </div>
               </div>
+
+              {expanded === listing.id && (
+                <div className="border-t border-white/[0.05] pt-3">
+                  <p className="text-[9px] tracking-[0.22em] text-white/30 uppercase px-4 pb-2">
+                    Horarios de salida
+                  </p>
+                  <SlotEditor
+                    listingId={listing.id}
+                    onCountChange={(n) => setSlotCounts(c => ({ ...c, [listing.id]: n }))}
+                  />
+                </div>
+              )}
 
               {/* Footer */}
               <div className="flex items-center justify-between px-4 py-3 border-t border-white/[0.05]">

@@ -170,7 +170,7 @@ export default function ConciergeInner({ conversations, bookings, stats }: {
   conversations: Conversation[]; bookings: Booking[]; stats: Stats
 }) {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<'chats'|'leads'|'reservas'|'calendario'|'analytics'>('chats')
+  const [activeTab, setActiveTab] = useState<'chats'|'leads'|'reservas'|'calendario'|'analytics'>('reservas')
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null)
   const [statusFilter, setStatusFilter] = useState('all')
   const [bookingFilter, setBookingFilter] = useState('all')

@@ -1,19 +1,21 @@
 'use client'
 
 export const ADMIN_TABS = [
-  { key: 'dashboard', label: 'Imágenes' },
+  { key: 'concierge', label: 'Reservas' },
   { key: 'listings',  label: 'Actividades' },
+  { key: 'providers', label: 'Operadores' },
+  { key: 'dashboard', label: 'Imágenes' },
   { key: 'referrers', label: 'Referidos' },
-  { key: 'concierge', label: 'Concierge' },
 ] as const
 
 export type AdminTab = (typeof ADMIN_TABS)[number]['key']
 
 const TAB_TITLES: Record<AdminTab, string> = {
-  dashboard: 'Imágenes',
+  concierge: 'Reservas y leads',
   listings:  'Actividades',
+  providers: 'Operadores',
+  dashboard: 'Imágenes',
   referrers: 'Referidos',
-  concierge: 'Concierge AI',
 }
 
 export default function AdminHeader({
