@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import SlotEditor from './SlotEditor'
 
 type Listing = {
@@ -11,7 +12,13 @@ type Listing = {
   capacity: number | null
   closed_weekdays: number[] | null
   active: boolean
+  images: string[] | null
+  provider_id: string | null
 }
+
+type Provider = { id: string; name: string }
+
+const NO_AGENCY = '__none__'
 
 const WEEKDAYS = [
   { label: 'D', value: 0, full: 'Dom' },
@@ -47,9 +54,17 @@ type RowState = {
   error: string
 }
 
-export default function ListingsClient({ listings }: { listings: Listing[] }) {
+export default function ListingsClient({
+  listings,
+  providers,
+}: {
+  listings: Listing[]
+  providers: Provider[]
+}) {
   const [search, setSearch] = useState('')
   const [catFilter, setCatFilter] = useState('all')
+  const [agencyFilter, setAgencyFilter] = useState('all')
+  const [photosFirst, setPhotosFirst] = useState(true)
   const [expanded, setExpanded] = useState<string | null>(null)
   const [slotCounts, setSlotCounts] = useState<Record<string, number>>({})
 
@@ -114,13 +129,43 @@ export default function ListingsClient({ listings }: { listings: Listing[] }) {
     }
   }
 
-  const filtered = listings.filter(l => {
-    const matchesCat = catFilter === 'all' || l.category === catFilter
-    const matchesSearch = !search.trim() || l.name.toLowerCase().includes(search.trim().toLowerCase())
-    return matchesCat && matchesSearch
-  })
+  const providerName = (id: string | null) =>
+    (id && providers.find(p => p.id === id)?.name) || 'Sin agencia'
+
+  const hasPhoto = (l: Listing) => !!l.images?.length
+
+  const filtered = listings
+    .filter(l => {
+      const matchesCat = catFilter === 'all' || l.category === catFilter
+      const matchesAgency =
+        agencyFilter === 'all' ||
+        (agencyFilter === NO_AGENCY ? !l.provider_id : l.provider_id === agencyFilter)
+      const matchesSearch = !search.trim() || l.name.toLowerCase().includes(search.trim().toLowerCase())
+      return matchesCat && matchesAgency && matchesSearch
+    })
+    .sort((a, b) => {
+      const diff = Number(hasPhoto(b)) - Number(hasPhoto(a))
+      if (diff !== 0) return photosFirst ? diff : -diff
+      return a.name.localeCompare(b.name)
+    })
 
   const cats = ['all', ...Array.from(new Set(listings.map(l => l.category)))]
+
+  // Solo las agencias que realmente tienen actividades, con su conteo de fotos
+  const agencyOptions = [
+    ...providers
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        items: listings.filter(l => l.provider_id === p.id),
+      }))
+      .filter(a => a.items.length),
+    ...(listings.some(l => !l.provider_id)
+      ? [{ id: NO_AGENCY, name: 'Sin agencia', items: listings.filter(l => !l.provider_id) }]
+      : []),
+  ]
+
+  const conFoto = filtered.filter(hasPhoto).length
 
   return (
     <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
@@ -157,8 +202,50 @@ export default function ListingsClient({ listings }: { listings: Listing[] }) {
         </div>
       </div>
 
+      {/* Agencias + orden por foto */}
+      <div className="flex-shrink-0 flex flex-wrap items-center gap-2 px-6 py-3 border-b border-white/[0.06]">
+        <span className="text-[9px] tracking-[0.22em] text-white/25 uppercase mr-1">Agencia</span>
+
+        <button
+          onClick={() => setAgencyFilter('all')}
+          className={`px-3 py-1.5 rounded-full text-[10px] tracking-[0.14em] uppercase font-medium transition-colors ${
+            agencyFilter === 'all' ? 'bg-[#C4A45A] text-[#080808]' : 'bg-white/[0.05] text-white/30 hover:text-white/60'
+          }`}
+        >
+          Todas
+        </button>
+
+        {agencyOptions.map(a => {
+          const withPhoto = a.items.filter(hasPhoto).length
+          return (
+            <button
+              key={a.id}
+              onClick={() => setAgencyFilter(a.id)}
+              title={`${withPhoto} de ${a.items.length} con foto`}
+              className={`px-3 py-1.5 rounded-full text-[10px] tracking-[0.14em] uppercase font-medium transition-colors ${
+                agencyFilter === a.id ? 'bg-[#C4A45A] text-[#080808]' : 'bg-white/[0.05] text-white/30 hover:text-white/60'
+              }`}
+            >
+              {a.name} <span className="opacity-60">{withPhoto}/{a.items.length}</span>
+            </button>
+          )
+        })}
+
+        <button
+          onClick={() => setPhotosFirst(v => !v)}
+          className="ml-auto px-3 py-1.5 rounded-full text-[10px] tracking-[0.14em] uppercase font-medium bg-white/[0.05] text-white/40 hover:text-white/75 transition-colors"
+        >
+          {photosFirst ? 'Con foto primero' : 'Sin foto primero'}
+        </button>
+      </div>
+
       {/* List */}
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2">
+        {filtered.length > 0 && (
+          <p className="text-[10px] tracking-[0.18em] text-white/25 uppercase pb-1">
+            {filtered.length} {filtered.length === 1 ? 'actividad' : 'actividades'} · {conFoto} con foto · {filtered.length - conFoto} sin foto
+          </p>
+        )}
         {filtered.length === 0 && (
           <p className="text-white/20 text-sm text-center py-16">Sin resultados</p>
         )}
@@ -176,10 +263,32 @@ export default function ListingsClient({ listings }: { listings: Listing[] }) {
             >
               {/* Header row */}
               <div className="flex items-center gap-3 px-4 pt-4 pb-3">
-                <span className={`text-[9px] px-2 py-0.5 rounded-full tracking-[0.15em] uppercase font-medium ${CATEGORY_COLOR[listing.category] ?? 'bg-white/10 text-white/40'}`}>
-                  {CATEGORY_LABEL[listing.category] ?? listing.category}
-                </span>
-                <p className="text-sm font-medium text-[#F2EDE4] flex-1 truncate">{listing.name}</p>
+                {listing.images?.length ? (
+                  <Image
+                    src={listing.images[0]}
+                    alt=""
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                  />
+                ) : (
+                  <span
+                    title="Sin foto"
+                    className="w-10 h-10 rounded-lg flex-shrink-0 border border-dashed border-white/15 flex items-center justify-center text-[8px] tracking-[0.1em] uppercase text-white/25"
+                  >
+                    Foto
+                  </span>
+                )}
+
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#F2EDE4] truncate">{listing.name}</p>
+                  <p className="text-[10px] text-white/25 truncate">
+                    <span className={`inline-block px-1.5 rounded-full mr-1.5 ${CATEGORY_COLOR[listing.category] ?? 'bg-white/10 text-white/40'}`}>
+                      {CATEGORY_LABEL[listing.category] ?? listing.category}
+                    </span>
+                    {providerName(listing.provider_id)}
+                  </p>
+                </div>
 
                 <button
                   onClick={() => setExpanded(expanded === listing.id ? null : listing.id)}

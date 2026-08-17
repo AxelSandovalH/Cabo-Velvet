@@ -12,6 +12,7 @@ type Listing = {
   id: string; name: string; category: string
   price: number | null; capacity: number | null
   closed_weekdays: number[] | null; active: boolean
+  images: string[] | null; provider_id: string | null
 }
 type Conversation = {
   id: string; phone: string; name: string | null; lead_status: string
@@ -33,13 +34,14 @@ type Stats = { total: number; qualified: number; converted: number; linksSent: n
 type Props = {
   categories: { cat: string; label: string; agencies: { name: string; listings: unknown[] }[] }[]
   listings: Listing[]
+  providers: { id: string; name: string }[]
   siteUrl: string
   conversations: Conversation[]
   bookings: Booking[]
   stats: Stats
 }
 
-export default function AdminApp({ categories, listings, siteUrl, conversations, bookings, stats }: Props) {
+export default function AdminApp({ categories, listings, providers, siteUrl, conversations, bookings, stats }: Props) {
   const [tab, setTab] = useState<AdminTab>('concierge')
 
   return (
@@ -51,7 +53,7 @@ export default function AdminApp({ categories, listings, siteUrl, conversations,
           <DashboardClient categories={categories as Parameters<typeof DashboardClient>[0]['categories']} />
         )}
         {tab === 'listings' && (
-          <ListingsClient listings={listings} />
+          <ListingsClient listings={listings} providers={providers} />
         )}
         {tab === 'providers' && (
           <ProvidersClient />

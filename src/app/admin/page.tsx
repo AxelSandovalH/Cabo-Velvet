@@ -10,6 +10,13 @@ const CATEGORY_LABEL: Record<string, string> = {
 }
 const CATEGORY_ORDER = ['experience', 'villa', 'yacht', 'service']
 
+type AdminListing = {
+  id: string; name: string; category: string
+  price: number | null; capacity: number | null
+  closed_weekdays: number[] | null; active: boolean
+  images: string[] | null; provider_id: string | null
+}
+
 export default async function AdminPage() {
   const authClient = await createSupabaseServer()
   const { data: { user } } = await authClient.auth.getUser()
@@ -28,7 +35,7 @@ export default async function AdminPage() {
   ] = await Promise.all([
     db.from('listings').select('id, name, category, images, provider_id').order('name'),
     db.from('providers').select('id, name'),
-    db.from('listings').select('id, name, category, price, capacity, closed_weekdays, active').order('name'),
+    db.from('listings').select('id, name, category, price, capacity, closed_weekdays, active, images, provider_id').order('name'),
     db.from('conversations')
       .select('id, phone, name, lead_status, interests, budget_range, travel_date, group_size, updated_at, created_at')
       .order('updated_at', { ascending: false }).limit(100),
@@ -91,7 +98,8 @@ export default async function AdminPage() {
   return (
     <AdminApp
       categories={categories}
-      listings={(adminListings ?? []) as { id: string; name: string; category: string; price: number | null; capacity: number | null; closed_weekdays: number[] | null; active: boolean }[]}
+      listings={(adminListings ?? []) as AdminListing[]}
+      providers={(providers ?? []) as { id: string; name: string }[]}
       siteUrl={siteUrl}
       conversations={conversationsWithMessages}
       bookings={bookingsWithListings}
