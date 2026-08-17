@@ -14,6 +14,10 @@ export type SendResult = { ok: boolean; id?: string; error?: string }
 
 const FROM = process.env.EMAIL_FROM ?? 'Cabo Rico <reservas@caboricotours.com>'
 
+// The sending domain has no inbox of its own, so replies are routed to a
+// mailbox that is actually read. Falls back to the From address.
+const REPLY_TO = process.env.EMAIL_REPLY_TO?.trim()
+
 export async function sendEmail({ to, subject, html, replyTo }: SendArgs): Promise<SendResult> {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
@@ -36,7 +40,7 @@ export async function sendEmail({ to, subject, html, replyTo }: SendArgs): Promi
         to: recipients,
         subject,
         html,
-        ...(replyTo ? { reply_to: replyTo } : {}),
+        ...((replyTo ?? REPLY_TO) ? { reply_to: replyTo ?? REPLY_TO } : {}),
       }),
     })
 
