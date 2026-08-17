@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { fetchListingById, formatPrice } from '@/lib/listings'
+import { fetchSlots } from '@/lib/slots'
 import LuxuryDetailLayout from '@/components/LuxuryDetailLayout'
 
 const WHATSAPP = '523141222146'
@@ -40,6 +41,9 @@ export default async function ListingPage({
   const listing = await fetchListingById(id)
   if (!listing) notFound()
 
+  // Configured departure times bring up the booking widget even without a capacity
+  const slots = await fetchSlots(listing.id)
+
   const heroImage =
     listing.images?.[0] ??
     'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=1920&q=90&auto=format&fit=crop'
@@ -74,6 +78,7 @@ export default async function ListingPage({
     priceRaw={listing.price}
     priceUnit={listing.price_unit}
     capacity={listing.capacity}
+    hasSlots={slots.length > 0}
     />
   )
 }

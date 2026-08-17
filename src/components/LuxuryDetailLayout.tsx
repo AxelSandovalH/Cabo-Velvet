@@ -28,6 +28,7 @@ interface Props {
   whatsappMsg: string;
   listingId?: string;
   capacity?: number | null;
+  hasSlots?: boolean;
 }
 
 const WHATSAPP_NUMBER = "523141222146";
@@ -52,6 +53,7 @@ export default function LuxuryDetailLayout({
   whatsappMsg,
   listingId,
   capacity,
+  hasSlots = false,
 }: Props) {
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMsg)}`;
   const sub = location ?? model ?? "";
@@ -277,7 +279,7 @@ export default function LuxuryDetailLayout({
             </p>
 
             {/* Booking widget or simple checkout */}
-            {listingId && priceRaw && capacity != null ? (
+            {listingId && priceRaw && (capacity != null || hasSlots) ? (
               <div className="text-left mb-8">
                 <BookingWidget
                   listingId={listingId}
@@ -302,7 +304,7 @@ export default function LuxuryDetailLayout({
               </div>
             )}
 
-            {(!listingId || !priceRaw || capacity == null) && (
+            {(!listingId || !priceRaw || (capacity == null && !hasSlots)) && (
               <p className="text-[8.5px] tracking-[0.22em] text-[#2A2018] uppercase">
                 Instant response · No booking fees · 100% private
               </p>
