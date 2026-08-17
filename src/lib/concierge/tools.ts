@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabase } from '@/lib/supabase'
 import { getStripe } from '@/lib/stripe'
+import { experienceFilterEnabled, experienceProviderFilter, isPublicListing } from '@/lib/providers'
 
 export const tools: Anthropic.Tool[] = [
   {
@@ -106,6 +107,8 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
           .order('price', { ascending: true })
 
         if (category) q = q.eq('category', category)
+        // El bot solo puede recomendar experiencias de los proveedores autorizados
+        if (experienceFilterEnabled) q = q.or(experienceProviderFilter)
         if (keywords) q = q.or(`name.ilike.%${keywords}%,tagline.ilike.%${keywords}%`)
         if (max_price) q = q.lte('price', max_price)
         if (min_price) q = q.gte('price', min_price)
@@ -120,11 +123,14 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
         const { id } = input as { id: string }
         const { data, error } = await supabase
           .from('listings')
-          .select('id, name, tagline, description, category, price, price_unit, price_notes, location, details, images')
+          .select('id, name, tagline, description, category, price, price_unit, price_notes, location, details, images, provider_id')
           .eq('id', id)
           .eq('active', true)
           .single()
         if (error) throw error
+        if (!isPublicListing(data)) {
+          return JSON.stringify({ error: 'Listing not available — search the catalog again and pick another option' })
+        }
         return JSON.stringify(data)
       }
 
@@ -138,11 +144,12 @@ export async function executeTool(name: string, input: ToolInput): Promise<strin
 
         const { data: listing, error } = await supabase
           .from('listings')
-          .select('id, name, tagline, price')
+          .select('id, name, tagline, price, category, provider_id')
           .eq('id', listing_id)
           .eq('active', true)
           .single()
         if (error || !listing) return JSON.stringify({ error: 'Listing not found — search again and use the correct id' })
+        if (!isPublicListing(listing)) return JSON.stringify({ error: 'This listing cannot be sold — search the catalog again and pick another option' })
         if (!listing.price) return JSON.stringify({ error: 'This listing has no price — tell user to contact via WhatsApp' })
 
         const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? '').trim().replace(/\/+$/, '') || 'https://www.caboricotours.com'

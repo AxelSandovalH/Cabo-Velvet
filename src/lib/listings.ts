@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { EXPERIENCE_PROVIDER_IDS, experienceFilterEnabled, isPublicListing } from './providers'
 
 export type DBListing = {
   id: string
@@ -24,12 +25,19 @@ export type DBListing = {
 export async function fetchListingsByCategory(
   category: DBListing['category']
 ): Promise<DBListing[]> {
-  const { data, error } = await supabase
+  let query = supabase
     .from('listings')
     .select('id, name, tagline, location, description, price, price_unit, images, category, capacity, closed_weekdays, details')
     .eq('category', category)
     .eq('active', true)
     .order('name')
+
+  // Solo mostramos experiencias de los proveedores autorizados
+  if (category === 'experience' && experienceFilterEnabled) {
+    query = query.in('provider_id', EXPERIENCE_PROVIDER_IDS)
+  }
+
+  const { data, error } = await query
 
   if (error) {
     console.error(`[fetchListings] ${category}:`, error.message)
@@ -42,12 +50,14 @@ export async function fetchListingsByCategory(
 export async function fetchListingById(id: string): Promise<DBListing | null> {
   const { data, error } = await supabase
     .from('listings')
-    .select('id, name, tagline, location, description, price, price_unit, images, category, capacity, closed_weekdays, details')
+    .select('id, name, tagline, location, description, price, price_unit, images, category, capacity, closed_weekdays, details, provider_id')
     .eq('id', id)
     .eq('active', true)
     .single()
 
-  if (error) return null
+  if (error || !data) return null
+  // Una experiencia oculta tampoco es accesible por URL directa
+  if (!isPublicListing(data)) return null
   return data
 }
 

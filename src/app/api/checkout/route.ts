@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
 import { supabase } from '@/lib/supabase'
 import { checkAvailability } from '@/lib/availability'
+import { isPublicListing } from '@/lib/providers'
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,12 +14,12 @@ export async function POST(req: NextRequest) {
 
     const { data: listing, error } = await supabase
       .from('listings')
-      .select('id, name, tagline, price, price_unit, images, capacity')
+      .select('id, name, tagline, price, price_unit, images, capacity, category, provider_id')
       .eq('id', listingId)
       .eq('active', true)
       .single()
 
-    if (error || !listing) {
+    if (error || !listing || !isPublicListing(listing)) {
       return NextResponse.json({ error: 'Listing not found' }, { status: 404 })
     }
 
