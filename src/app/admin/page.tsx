@@ -41,13 +41,17 @@ export default async function AdminPage() {
 
   // Build dashboard category tree
   const providerMap = Object.fromEntries((providers ?? []).map((p: { id: string; name: string }) => [p.id, p.name]))
-  const grouped: Record<string, Record<string, typeof rawListings>> = {}
-  for (const l of (rawListings ?? []) as { id: string; name: string; category: string; images: string[] | null; provider_id: string | null }[]) {
+  type DashboardListing = {
+    id: string; name: string; category: string
+    images: string[] | null; provider_id: string | null
+  }
+  const grouped: Record<string, Record<string, DashboardListing[]>> = {}
+  for (const l of (rawListings ?? []) as DashboardListing[]) {
     const cat = l.category ?? 'other'
     const agency = l.provider_id ? (providerMap[l.provider_id] ?? 'Sin agencia') : 'Sin agencia'
     if (!grouped[cat]) grouped[cat] = {}
     if (!grouped[cat][agency]) grouped[cat][agency] = []
-    ;(grouped[cat][agency] as typeof rawListings)!.push(l)
+    grouped[cat][agency].push(l)
   }
   const categories = CATEGORY_ORDER
     .filter((cat) => grouped[cat])
