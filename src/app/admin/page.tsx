@@ -33,7 +33,7 @@ export default async function AdminPage() {
       .select('id, phone, name, lead_status, interests, budget_range, travel_date, group_size, updated_at, created_at')
       .order('updated_at', { ascending: false }).limit(100),
     db.from('bookings')
-      .select('id, listing_id, stripe_url, status, created_at, conversation_id, phone, name, amount, confirmed_at')
+      .select('id, listing_id, stripe_url, status, created_at, conversation_id, phone, name, email, amount, confirmed_at, booking_date, start_time, supplier_status, deposit_amount, balance_due')
       .order('created_at', { ascending: false }).limit(100),
     db.from('messages').select('phone, role, content, created_at').order('created_at', { ascending: true }).limit(2000),
     db.from('listings').select('id, name').eq('active', true),

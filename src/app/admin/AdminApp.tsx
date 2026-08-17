@@ -24,6 +24,8 @@ type Booking = {
   stripe_url: string | null; status: string; created_at: string
   conversation_id: string | null; phone: string | null
   name: string | null; amount: number | null; confirmed_at: string | null
+  email: string | null; booking_date: string | null; start_time: string | null
+  supplier_status: string | null; deposit_amount: number | null; balance_due: number | null
 }
 type Stats = { total: number; qualified: number; converted: number; linksSent: number }
 

@@ -15,6 +15,8 @@ type Booking = {
   stripe_url: string | null; status: string; created_at: string
   conversation_id: string | null; phone: string | null
   name: string | null; amount: number | null; confirmed_at: string | null
+  email: string | null; booking_date: string | null; start_time: string | null
+  supplier_status: string | null; deposit_amount: number | null; balance_due: number | null
 }
 type Stats = { total: number; qualified: number; converted: number; linksSent: number }
 
@@ -32,6 +34,22 @@ const BOOKING_COLORS: Record<string, string> = {
 }
 const BOOKING_LABELS: Record<string, string> = {
   link_sent: 'Pendiente', confirmed: 'Confirmado', completed: 'Completado', cancelled: 'Cancelado',
+}
+const SUPPLIER_COLORS: Record<string, string> = {
+  pending: 'bg-white/5 text-white/30', sent: 'bg-amber-500/15 text-amber-300',
+  confirmed: 'bg-emerald-500/15 text-emerald-300', rejected: 'bg-red-500/15 text-red-300',
+  cancelled: 'bg-white/5 text-white/25',
+}
+const SUPPLIER_LABELS: Record<string, string> = {
+  pending: 'Operador: sin enviar', sent: 'Operador: esperando',
+  confirmed: 'Operador: confirmó', rejected: 'Operador: rechazó', cancelled: 'Operador: cancelado',
+}
+
+function slotLabel(time: string | null): string {
+  if (!time) return ''
+  const [h, m] = time.split(':').map(Number)
+  const period = h >= 12 ? 'PM' : 'AM'
+  return `${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, '0')} ${period}`
 }
 const CAL_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const CAL_DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa']
@@ -163,6 +181,17 @@ export default function ConciergeInner({ conversations, bookings, stats }: {
   async function updateBookingStatus(id: string, status: string) {
     setUpdating(id)
     await fetch(`/api/admin/bookings/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })
+    router.refresh()
+    setUpdating(null)
+  }
+
+  async function resendToSupplier(id: string) {
+    setUpdating(id)
+    await fetch(`/api/admin/bookings/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'resend_supplier' }),
+    })
     router.refresh()
     setUpdating(null)
   }
@@ -313,15 +342,33 @@ export default function ConciergeInner({ conversations, bookings, stats }: {
                         <p className="text-sm font-medium">{b.name ?? 'Sin nombre'}</p>
                         {b.phone && <p className="text-[11px] text-white/30">+52{b.phone}</p>}
                         <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${BOOKING_COLORS[b.status] ?? 'bg-white/10 text-white/40'}`}>{BOOKING_LABELS[b.status] ?? b.status}</span>
+                        {b.supplier_status && b.status !== 'link_sent' && (
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${SUPPLIER_COLORS[b.supplier_status] ?? 'bg-white/10 text-white/40'}`}>
+                            {SUPPLIER_LABELS[b.supplier_status] ?? b.supplier_status}
+                          </span>
+                        )}
                       </div>
                       <p className="text-[12px] text-white/50 mb-1.5">{b.listing_name ?? 'Experiencia'}</p>
                       <div className="flex gap-3 text-[11px] text-white/30 flex-wrap">
-                        {b.amount ? <span>{formatUSD(b.amount)}</span> : null}
+                        {b.booking_date && (
+                          <span className="text-white/45">
+                            {b.booking_date}{b.start_time ? ` · ${slotLabel(b.start_time)}` : ''}
+                          </span>
+                        )}
+                        {b.deposit_amount
+                          ? <span>Depósito {formatUSD(b.deposit_amount)}{b.balance_due ? ` · saldo ${formatUSD(b.balance_due)}` : ''}</span>
+                          : b.amount ? <span>{formatUSD(b.amount)}</span> : null}
+                        {b.email && <span className="text-white/25">{b.email}</span>}
                         <span>{timeAgo(b.created_at)}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap justify-end">
                       {b.stripe_url && <a href={b.stripe_url} target="_blank" rel="noopener noreferrer" className="text-[10px] px-2.5 py-1.5 bg-white/[0.05] text-white/40 rounded-lg hover:text-white/70 transition-colors">Ver pago</a>}
+                      {b.status !== 'link_sent' && ['pending','sent','rejected'].includes(b.supplier_status ?? '') && (
+                        <button onClick={() => resendToSupplier(b.id)} disabled={updating===b.id} className="text-[10px] px-2.5 py-1.5 bg-amber-500/10 text-amber-300 rounded-lg disabled:opacity-40">
+                          {updating===b.id ? '...' : b.supplier_status === 'pending' ? 'Enviar a operador' : 'Reenviar'}
+                        </button>
+                      )}
                       {b.status === 'link_sent' && <button onClick={() => updateBookingStatus(b.id,'confirmed')} disabled={updating===b.id} className="text-[10px] px-2.5 py-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg disabled:opacity-40">{updating===b.id?'...':'Confirmar'}</button>}
                       {b.status === 'confirmed' && <button onClick={() => updateBookingStatus(b.id,'completed')} disabled={updating===b.id} className="text-[10px] px-2.5 py-1.5 bg-blue-500/10 text-blue-400 rounded-lg disabled:opacity-40">{updating===b.id?'...':'Completado'}</button>}
                       {(b.status==='link_sent'||b.status==='confirmed') && <button onClick={() => updateBookingStatus(b.id,'cancelled')} disabled={updating===b.id} className="text-[10px] px-2.5 py-1.5 bg-red-500/10 text-red-400 rounded-lg disabled:opacity-40">Cancelar</button>}

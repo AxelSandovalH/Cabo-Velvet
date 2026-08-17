@@ -15,6 +15,36 @@ type AvailabilityData = {
   days: Record<string, DayStatus>
 }
 
+type Slot = {
+  id: string
+  start_time: string
+  label: string | null
+  available: number | null
+  soldOut: boolean
+}
+
+type SlotData = {
+  slots: Slot[]
+  depositPerPerson: number
+  balancePerPerson: number
+  totalPerPerson: number
+}
+
+function formatTime(time: string): string {
+  const [h, m] = time.split(':').map(Number)
+  const period = h >= 12 ? 'PM' : 'AM'
+  const hour = h % 12 === 0 ? 12 : h % 12
+  return `${hour}:${String(m).padStart(2, '0')} ${period}`
+}
+
+function usd(cents: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
+  }).format(cents / 100)
+}
+
 interface Props {
   listingId: string
   price: number
@@ -42,6 +72,9 @@ export default function BookingWidget({ listingId, price, priceUnit }: Props) {
   const [avail, setAvail] = useState<AvailabilityData | null>(null)
   const [loadingAvail, setLoadingAvail] = useState(false)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [slotData, setSlotData] = useState<SlotData | null>(null)
+  const [loadingSlots, setLoadingSlots] = useState(false)
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
   const [people, setPeople] = useState(1)
   const [guestName, setGuestName] = useState('')
   const [guestPhone, setGuestPhone] = useState('')
@@ -63,16 +96,44 @@ export default function BookingWidget({ listingId, price, priceUnit }: Props) {
     fetchAvail(viewYear, viewMonth)
   }, [fetchAvail, viewYear, viewMonth])
 
+  // Departure times depend on the chosen day, so they load with it
+  const fetchSlots = useCallback(async (date: string, keepSelection: boolean) => {
+    setLoadingSlots(true)
+    try {
+      const res = await fetch(`/api/availability/slots?listing_id=${listingId}&date=${date}`)
+      const data: SlotData = await res.json()
+      setSlotData(data)
+      // One departure time is not a choice — pick it for them
+      const open = (data.slots ?? []).filter(s => !s.soldOut)
+      if (!keepSelection) setSelectedSlot(open.length === 1 ? open[0].start_time : null)
+    } finally {
+      setLoadingSlots(false)
+    }
+  }, [listingId])
+
+  useEffect(() => {
+    if (selectedDate) fetchSlots(selectedDate, false)
+  }, [fetchSlots, selectedDate])
+
+  /** Single entry point for changing the day, so slot state never goes stale. */
+  function pickDate(date: string | null) {
+    setSelectedDate(date)
+    if (!date) {
+      setSlotData(null)
+      setSelectedSlot(null)
+    }
+  }
+
   function prevMonth() {
     if (viewMonth === 1) { setViewYear(y => y - 1); setViewMonth(12) }
     else setViewMonth(m => m - 1)
-    setSelectedDate(null)
+    pickDate(null)
   }
 
   function nextMonth() {
     if (viewMonth === 12) { setViewYear(y => y + 1); setViewMonth(1) }
     else setViewMonth(m => m + 1)
-    setSelectedDate(null)
+    pickDate(null)
   }
 
   function isBeforeToday(y: number, m: number, d: number) {
@@ -115,18 +176,27 @@ export default function BookingWidget({ listingId, price, priceUnit }: Props) {
     const { dateStr, past, status } = getDayInfo(d)
     if (past) return
     if (status?.closed || status?.available === 0) return
-    setSelectedDate(dateStr === selectedDate ? null : dateStr)
+    pickDate(dateStr === selectedDate ? null : dateStr)
     setError('')
     // Clamp people to available spots
     if (status?.available && people > status.available) setPeople(status.available)
   }
 
   const selectedStatus = selectedDate ? avail?.days[selectedDate] : null
-  const maxPeople = selectedStatus?.available ?? (avail?.capacity ?? 20)
+  const slots = slotData?.slots ?? []
+  const activeSlot = slots.find(s => s.start_time === selectedSlot) ?? null
+
+  // A slot's own capacity wins over the day's when it is tighter
+  const dayMax = selectedStatus?.available ?? (avail?.capacity ?? 20)
+  const maxPeople = activeSlot?.available != null ? Math.min(dayMax, activeSlot.available) : dayMax
+
   const total = price * people
+  const depositTotal = (slotData?.depositPerPerson ?? 0) * people
+  const balanceTotal = (slotData?.balancePerPerson ?? 0) * people
 
   async function handleBook() {
     if (!selectedDate) { setError('Please select a date'); return }
+    if (slots.length && !selectedSlot) { setError('Please select a departure time'); return }
     setBooking(true)
     setError('')
     try {
@@ -137,6 +207,7 @@ export default function BookingWidget({ listingId, price, priceUnit }: Props) {
         body: JSON.stringify({
           listingId,
           bookingDate: selectedDate,
+          startTime: selectedSlot ?? undefined,
           peopleCount: people,
           guestName: guestName || undefined,
           guestPhone: guestPhone || undefined,
@@ -146,7 +217,10 @@ export default function BookingWidget({ listingId, price, priceUnit }: Props) {
       const json = await res.json()
       if (!res.ok || json.error) {
         setError(json.error ?? 'Could not process booking')
-        if (res.status === 409) fetchAvail(viewYear, viewMonth)
+        if (res.status === 409) {
+          fetchAvail(viewYear, viewMonth)
+          if (selectedDate) fetchSlots(selectedDate, true)
+        }
       } else {
         window.location.href = json.url
       }
@@ -236,6 +310,48 @@ export default function BookingWidget({ listingId, price, priceUnit }: Props) {
             )}
           </div>
 
+          {/* Departure times */}
+          {loadingSlots && (
+            <p className="text-[10px] tracking-[0.2em] text-[#4A4038] uppercase">Loading times…</p>
+          )}
+          {!loadingSlots && slots.length > 0 && (
+            <div className="space-y-2">
+              <span className="text-[11px] tracking-[0.2em] text-[#8A8070] uppercase">Departure</span>
+              <div className="flex flex-wrap gap-2">
+                {slots.map(slot => {
+                  const isSelected = selectedSlot === slot.start_time
+                  return (
+                    <button
+                      key={slot.id}
+                      onClick={() => {
+                        if (slot.soldOut) return
+                        setSelectedSlot(isSelected ? null : slot.start_time)
+                        setError('')
+                        if (slot.available != null && people > slot.available) {
+                          setPeople(Math.max(1, slot.available))
+                        }
+                      }}
+                      disabled={slot.soldOut}
+                      className={`px-3.5 py-2 text-[12px] border transition-colors ${
+                        slot.soldOut
+                          ? 'border-white/[0.06] text-white/15 line-through cursor-not-allowed'
+                          : isSelected
+                            ? 'border-[#C4A45A] bg-[#C4A45A] text-[#080808] font-semibold'
+                            : 'border-white/[0.08] text-[#F2EDE4] hover:border-[#C4A45A]/40'
+                      }`}
+                    >
+                      {formatTime(slot.start_time)}
+                      {slot.label ? <span className="opacity-60"> · {slot.label}</span> : null}
+                      {slot.available != null && !slot.soldOut && slot.available <= 4 && (
+                        <span className="ml-1.5 text-[9px] opacity-70">{slot.available} left</span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {/* People stepper */}
           <div className="flex items-center justify-between">
             <span className="text-[11px] tracking-[0.2em] text-[#8A8070] uppercase">Guests</span>
@@ -275,17 +391,33 @@ export default function BookingWidget({ listingId, price, priceUnit }: Props) {
             />
           </div>
 
-          {/* Total + CTA */}
-          <div className="flex items-center justify-between pt-2">
+          {/* Payment split */}
+          {depositTotal > 0 && (
+            <div className="border-t border-white/[0.06] pt-4 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-[#8A8070]">Total</span>
+                <span className="text-[12px] text-[#F2EDE4]">
+                  ${total.toLocaleString()} USD
+                  {people > 1 && <span className="text-[#4A4038]"> · ${price} × {people}</span>}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-[#8A8070]">Balance on site</span>
+                <span className="text-[12px] text-[#F2EDE4]">{usd(balanceTotal)}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Deposit + CTA */}
+          <div className="flex items-end justify-between pt-1">
             <div>
-              <p className="text-[9px] tracking-[0.2em] text-[#4A4038] uppercase">Total</p>
-              <p className="font-display text-2xl font-light text-[#F2EDE4]"
-                style={{ fontFamily: 'var(--font-cormorant)' }}>
-                ${total.toLocaleString()} USD
+              <p className="text-[9px] tracking-[0.2em] text-[#4A4038] uppercase">
+                {depositTotal > 0 ? 'Pay now — deposit' : 'Total'}
               </p>
-              {people > 1 && (
-                <p className="text-[9px] text-[#4A4038]">${price} × {people} guests</p>
-              )}
+              <p className="font-display text-2xl font-light text-[#C4A45A]"
+                style={{ fontFamily: 'var(--font-cormorant)' }}>
+                {depositTotal > 0 ? usd(depositTotal) : `$${total.toLocaleString()}`} USD
+              </p>
             </div>
             <button
               onClick={handleBook}
@@ -295,6 +427,13 @@ export default function BookingWidget({ listingId, price, priceUnit }: Props) {
               {booking ? 'Processing…' : 'Reserve'}
             </button>
           </div>
+
+          {depositTotal > 0 && (
+            <p className="text-[10px] text-[#4A4038] text-center leading-relaxed">
+              Pay {usd(depositTotal)} now to hold your spot. The remaining {usd(balanceTotal)} is paid
+              to the operator on the day of your activity.
+            </p>
+          )}
 
           {error && (
             <p className="text-red-400 text-[11px] text-center">{error}</p>
