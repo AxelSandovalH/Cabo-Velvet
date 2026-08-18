@@ -48,7 +48,7 @@ export default function AdminApp({ categories, listings, providers, siteUrl, con
     <div className="h-screen flex flex-col bg-[#080808] text-[#F2EDE4] overflow-hidden">
       <AdminHeader current={tab} onTabChange={setTab} />
 
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
         {tab === 'dashboard' && (
           <DashboardClient categories={categories as Parameters<typeof DashboardClient>[0]['categories']} />
         )}
