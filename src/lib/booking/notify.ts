@@ -47,7 +47,7 @@ export async function loadBooking(bookingId: string): Promise<LoadedBooking | nu
 
   const { data: listing } = await supabase
     .from('listings')
-    .select('name, location, provider_id')
+    .select('name, location, provider_id, price_notes')
     .eq('id', booking.listing_id)
     .single()
 
@@ -82,6 +82,7 @@ export async function loadBooking(bookingId: string): Promise<LoadedBooking | nu
       guestName: booking.name,
       guestPhone: booking.phone,
       guestEmail: booking.email,
+      priceNotes: listing?.price_notes ?? null,
       supplierNote: booking.supplier_note,
     },
   }

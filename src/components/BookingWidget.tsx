@@ -49,6 +49,7 @@ interface Props {
   listingId: string
   price: number
   priceUnit: string | null
+  priceNotes?: string | null
 }
 
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
@@ -65,7 +66,7 @@ function toMonthParam(y: number, m: number) {
   return `${y}-${String(m).padStart(2, '0')}`
 }
 
-export default function BookingWidget({ listingId, price, priceUnit }: Props) {
+export default function BookingWidget({ listingId, price, priceUnit, priceNotes }: Props) {
   const today = new Date()
   const [viewYear, setViewYear] = useState(today.getFullYear())
   const [viewMonth, setViewMonth] = useState(today.getMonth() + 1)
@@ -405,6 +406,9 @@ export default function BookingWidget({ listingId, price, priceUnit }: Props) {
                 <span className="text-[11px] text-[#8A8070]">Balance on site</span>
                 <span className="text-[12px] text-[#F2EDE4]">{usd(balanceTotal)}</span>
               </div>
+              {priceNotes && (
+                <p className="text-[10px] text-[#6A6050] leading-relaxed pt-1">{priceNotes}</p>
+              )}
             </div>
           )}
 

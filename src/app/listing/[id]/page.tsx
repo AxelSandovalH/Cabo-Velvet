@@ -77,6 +77,7 @@ export default async function ListingPage({
       listingId={listing.id}
     priceRaw={listing.price}
     priceUnit={listing.price_unit}
+    priceNotes={listing.price_notes}
     capacity={listing.capacity}
     hasSlots={slots.length > 0}
     />

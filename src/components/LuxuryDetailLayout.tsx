@@ -29,6 +29,7 @@ interface Props {
   listingId?: string;
   capacity?: number | null;
   hasSlots?: boolean;
+  priceNotes?: string | null;
 }
 
 const WHATSAPP_NUMBER = "523141222146";
@@ -54,6 +55,7 @@ export default function LuxuryDetailLayout({
   listingId,
   capacity,
   hasSlots = false,
+  priceNotes,
 }: Props) {
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMsg)}`;
   const sub = location ?? model ?? "";
@@ -274,9 +276,15 @@ export default function LuxuryDetailLayout({
             >
               {price}
             </h2>
-            <p className="text-[#4A4038] text-[10px] tracking-[0.25em] uppercase mb-10">
+            <p className="text-[#4A4038] text-[10px] tracking-[0.25em] uppercase mb-3">
               {durationOrStay}
             </p>
+            {priceNotes && (
+              <p className="text-[#8A8070] text-[11px] leading-relaxed max-w-sm mx-auto mb-8">
+                {priceNotes}
+              </p>
+            )}
+            {!priceNotes && <div className="mb-7" />}
 
             {/* Booking widget or simple checkout */}
             {listingId && priceRaw && (capacity != null || hasSlots) ? (
@@ -285,6 +293,7 @@ export default function LuxuryDetailLayout({
                   listingId={listingId}
                   price={priceRaw}
                   priceUnit={priceUnit}
+                  priceNotes={priceNotes}
                 />
               </div>
             ) : (

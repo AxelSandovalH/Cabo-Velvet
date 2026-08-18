@@ -18,6 +18,7 @@ export type BookingEmailData = {
   guestName: string | null
   guestPhone: string | null
   guestEmail: string | null
+  priceNotes?: string | null
   supplierNote?: string | null
 }
 
@@ -107,7 +108,8 @@ export function customerDepositEmail(d: BookingEmailData) {
        You will get a second email with the final confirmation, usually within a few hours.</p>
        ${detailRows(d, 'en')}
        ${moneyBlock(d, 'en')}
-       <p style="margin:0;color:#6B6458;font-size:13px;">The balance is paid directly to the operator on the day of your activity.</p>`,
+       <p style="margin:0;color:#6B6458;font-size:13px;">The balance is paid directly to the operator on the day of your activity.</p>
+       ${d.priceNotes ? `<p style="margin:12px 0 0;color:#6B6458;font-size:13px;">${d.priceNotes}.</p>` : ''}`,
       `Questions? Just reply to this email.<br/>Cabo Rico · Los Cabos, BCS, México`
     ),
   }
@@ -123,7 +125,8 @@ export function customerConfirmedEmail(d: BookingEmailData) {
        ${detailRows(d, 'en')}
        ${moneyBlock(d, 'en')}
        ${d.supplierNote ? `<p style="margin:0 0 16px;padding:14px;background:rgba(196,164,90,0.08);border-left:2px solid ${GOLD};font-size:13px;">${d.supplierNote}</p>` : ''}
-       <p style="margin:0;color:#6B6458;font-size:13px;">Please arrive 15 minutes early and bring the balance shown above.</p>`,
+       <p style="margin:0;color:#6B6458;font-size:13px;">Please arrive 15 minutes early and bring the balance shown above.</p>
+       ${d.priceNotes ? `<p style="margin:12px 0 0;color:#6B6458;font-size:13px;">${d.priceNotes}.</p>` : ''}`,
       `Need to change something? Reply to this email.<br/>Cabo Rico · Los Cabos, BCS, México`
     ),
   }
