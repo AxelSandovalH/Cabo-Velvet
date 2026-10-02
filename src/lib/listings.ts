@@ -1,6 +1,21 @@
 import { supabase } from './supabase'
 import { EXPERIENCE_PROVIDER_IDS, experienceFilterEnabled, isPublicListing } from './providers'
 
+/**
+ * Temporary: a listing with no photo falls back to a generic stock image on
+ * every card, so the public catalog hides them until they have their own.
+ * Set to false to show everything again.
+ *
+ * Only affects the website — the admin panel still lists them, and the
+ * concierge bot can still quote and charge them, so payment links already
+ * sent keep working.
+ */
+export const REQUIRE_PHOTO = true
+
+export function hasPhoto(listing: { images?: string[] | null }): boolean {
+  return (listing.images?.length ?? 0) > 0
+}
+
 export type DBListing = {
   id: string
   name: string
@@ -45,7 +60,7 @@ export async function fetchListingsByCategory(
     return []
   }
 
-  return data ?? []
+  return REQUIRE_PHOTO ? (data ?? []).filter(hasPhoto) : (data ?? [])
 }
 
 export async function fetchListingById(id: string): Promise<DBListing | null> {
@@ -59,6 +74,7 @@ export async function fetchListingById(id: string): Promise<DBListing | null> {
   if (error || !data) return null
   // Una experiencia oculta tampoco es accesible por URL directa
   if (!isPublicListing(data)) return null
+  if (REQUIRE_PHOTO && !hasPhoto(data)) return null
   return data
 }
 
