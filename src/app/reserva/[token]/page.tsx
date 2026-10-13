@@ -1,10 +1,16 @@
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import { supabase } from '@/lib/supabase'
 import { formatUSD } from '@/lib/pricing'
 import { formatTime } from '@/lib/slots'
 import SupplierResponse from './SupplierResponse'
 
 export const dynamic = 'force-dynamic'
+
+// Token-reachable and carries the guest's name and phone: never index it
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+}
 
 export default async function SupplierConfirmPage({
   params,

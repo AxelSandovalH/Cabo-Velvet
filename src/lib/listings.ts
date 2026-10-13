@@ -29,6 +29,7 @@ export type DBListing = {
   category: 'villa' | 'yacht' | 'experience' | 'service'
   capacity: number | null
   closed_weekdays: number[] | null
+  updated_at?: string | null
   details: {
     specs?: { label: string; value: string }[]
     includes?: string[]
@@ -43,7 +44,7 @@ export async function fetchListingsByCategory(
 ): Promise<DBListing[]> {
   let query = supabase
     .from('listings')
-    .select('id, name, tagline, location, description, price, price_unit, price_notes, images, category, capacity, closed_weekdays, details')
+    .select('id, name, tagline, location, description, price, price_unit, price_notes, images, category, capacity, closed_weekdays, updated_at, details')
     .eq('category', category)
     .eq('active', true)
     .order('name')
